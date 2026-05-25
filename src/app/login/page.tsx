@@ -8,95 +8,73 @@ import { supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [email, setEmail] = useState('')
+  const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [loading,  setLoading]  = useState(false)
+  const [error,    setError]    = useState('')
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault()
-    setLoading(true)
-    setError('')
-
-    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
-
+    setLoading(true); setError('')
+    const { error: authErr } = await supabase.auth.signInWithPassword({ email, password })
     setLoading(false)
-    if (authError) {
-      setError('E-Mail oder Passwort falsch.')
-    } else {
-      router.push('/dashboard')
-    }
+    if (authErr) setError('E-Mail oder Passwort falsch.')
+    else router.push('/dashboard')
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'var(--dark-brown)' }}>
+    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'var(--espresso)' }}>
       <div className="w-full max-w-md">
+
         <Link
           href="/"
-          className="inline-flex items-center gap-2 font-body text-xs tracking-widest uppercase mb-12 hover:opacity-70"
-          style={{ color: 'var(--muted)' }}
+          className="eyebrow inline-flex items-center gap-2 mb-14 hover:text-[var(--honey)] transition-colors"
+          style={{ color: 'rgba(242,234,217,0.4)' }}
         >
-          <ArrowLeft size={14} />
-          Zur Hochzeitsseite
+          <ArrowLeft size={14} /> Zur Hochzeitsseite
         </Link>
 
-        <div className="text-center mb-12">
-          <p className="font-script text-5xl mb-4" style={{ color: 'var(--gold)' }}>
-            Eileen & Eduard
+        {/* Branding */}
+        <div className="text-center mb-14">
+          <p className="f-script mb-3" style={{ fontSize: '4rem', color: 'var(--honey)', lineHeight: 1 }}>
+            E &amp; E
           </p>
-          <p className="font-body text-xs tracking-[0.4em] uppercase" style={{ color: 'var(--muted)' }}>
-            Brautpaar-Bereich
-          </p>
+          <p className="eyebrow" style={{ color: 'rgba(242,234,217,0.35)' }}>Brautpaar-Bereich</p>
         </div>
 
-        <form onSubmit={handleLogin} className="flex flex-col gap-6">
+        <form onSubmit={handleLogin} className="flex flex-col gap-8">
           <div>
-            <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'rgba(253,250,245,0.5)' }}>
+            <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'rgba(242,234,217,0.4)' }}>
               E-Mail
             </label>
             <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent"
-              style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--cream)' }}
+              type="email" required
+              value={email} onChange={e => setEmail(e.target.value)}
+              className="field"
+              style={{ borderColor: 'rgba(201,168,108,0.3)', color: 'var(--warm-white)' }}
             />
           </div>
-
           <div>
-            <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'rgba(253,250,245,0.5)' }}>
+            <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'rgba(242,234,217,0.4)' }}>
               Passwort
             </label>
             <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent"
-              style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--cream)' }}
+              type="password" required
+              value={password} onChange={e => setPassword(e.target.value)}
+              className="field"
+              style={{ borderColor: 'rgba(201,168,108,0.3)', color: 'var(--warm-white)' }}
             />
           </div>
 
-          {error && (
-            <p className="font-body text-sm text-center" style={{ color: 'var(--terracotta)' }}>
-              {error}
-            </p>
-          )}
+          {error && <p className="f-sans text-sm text-center" style={{ color: 'var(--rose)' }}>{error}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="py-4 font-body text-sm tracking-widest uppercase transition-all hover:opacity-90 disabled:opacity-50 mt-4"
-            style={{
-              background: 'var(--gold)',
-              color: 'var(--dark-brown)',
-              borderRadius: '2px',
-              letterSpacing: '0.2em',
-              fontWeight: 600,
-            }}
+            className="btn-primary w-full text-center disabled:opacity-50 mt-4"
+            style={{ background: 'var(--honey)', borderColor: 'var(--honey)', color: 'var(--espresso)', fontWeight: 500 }}
           >
-            {loading ? 'Anmelden...' : 'Einloggen'}
+            {loading ? 'Anmelden…' : 'Einloggen'}
           </button>
         </form>
       </div>

@@ -8,285 +8,163 @@ import { supabase } from '@/lib/supabase'
 type RSVPStatus = 'confirmed' | 'declined' | null
 
 export default function RSVPPage() {
-  const [status, setStatus] = useState<RSVPStatus>(null)
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    adults: 1,
-    children: 0,
-    dietary_notes: '',
-    message: '',
-  })
+  const [status,    setStatus]    = useState<RSVPStatus>(null)
   const [submitted, setSubmitted] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [loading,   setLoading]   = useState(false)
+  const [error,     setError]     = useState('')
+  const [form, setForm] = useState({
+    name: '', email: '', phone: '',
+    adults: 1, children: 0,
+    dietary_notes: '', message: '',
+  })
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!status) {
-      setError('Bitte wählt aus, ob ihr zusagen oder absagen möchtet.')
-      return
-    }
-    setLoading(true)
-    setError('')
-
-    const { error: dbError } = await supabase.from('guests').insert({
-      name: form.name,
-      email: form.email || null,
-      phone: form.phone || null,
-      rsvp_status: status,
-      adults: form.adults,
-      children: form.children,
-      dietary_notes: form.dietary_notes || null,
-      message: form.message || null,
+    if (!status) { setError('Bitte wählt Zu- oder Absage.'); return }
+    setLoading(true); setError('')
+    const { error: dbErr } = await supabase.from('guests').insert({
+      name: form.name, email: form.email || null, phone: form.phone || null,
+      rsvp_status: status, adults: form.adults, children: form.children,
+      dietary_notes: form.dietary_notes || null, message: form.message || null,
     })
-
     setLoading(false)
-    if (dbError) {
-      setError('Es ist ein Fehler aufgetreten. Bitte versucht es erneut oder kontaktiert die Trauzeugen.')
-    } else {
-      setSubmitted(true)
-    }
+    if (dbErr) setError('Ein Fehler ist aufgetreten. Bitte versucht es erneut.')
+    else setSubmitted(true)
   }
 
-  if (submitted) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'var(--cream)' }}>
-        <div className="max-w-md w-full text-center">
-          <div
-            className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8"
-            style={{ background: status === 'confirmed' ? 'var(--terracotta)' : 'var(--muted)' }}
-          >
-            {status === 'confirmed' ? (
-              <Check size={36} color="white" />
-            ) : (
-              <X size={36} color="white" />
-            )}
-          </div>
-
-          <h2 className="font-heading text-4xl font-light mb-4" style={{ color: 'var(--dark-brown)' }}>
-            {status === 'confirmed' ? 'Wir freuen uns!' : 'Schade, aber okay!'}
-          </h2>
-
-          <p className="font-body font-light text-base mb-8" style={{ color: 'var(--muted)' }}>
-            {status === 'confirmed'
-              ? `Vielen Dank, ${form.name}! Eure Zusage ist bei uns eingegangen. Wir freuen uns sehr, diesen besonderen Tag mit euch zu teilen.`
-              : `Danke für die Nachricht, ${form.name}. Ihr werdet uns fehlen! Wenn sich etwas ändert, meldet euch gerne.`}
-          </p>
-
-          <div className="gold-divider w-32 mx-auto mb-8">
-            <span style={{ color: 'var(--gold)', fontSize: '0.8rem' }}>✦</span>
-          </div>
-
-          <p className="font-heading italic text-xl mb-8" style={{ color: 'var(--dark-brown)' }}>
-            Eileen & Eduard
-          </p>
-
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 font-body text-xs tracking-widest uppercase hover:opacity-70"
-            style={{ color: 'var(--terracotta)' }}
-          >
-            <ArrowLeft size={14} />
-            Zurück zur Startseite
-          </Link>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="min-h-screen py-24 px-6" style={{ background: 'var(--cream)' }}>
-      <div className="max-w-2xl mx-auto">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 font-body text-xs tracking-widest uppercase mb-12 hover:opacity-70"
-          style={{ color: 'var(--muted)' }}
+  /* ── Bestätigungsseite ─────────────────────── */
+  if (submitted) return (
+    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: 'var(--linen)' }}>
+      <div className="max-w-md w-full text-center py-20">
+        <div
+          className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-8"
+          style={{ background: status === 'confirmed' ? 'var(--caramel)' : 'var(--muted)' }}
         >
-          <ArrowLeft size={14} />
-          Zurück
+          {status === 'confirmed' ? <Check size={32} color="#fff" /> : <X size={32} color="#fff" />}
+        </div>
+        <h2 className="f-serif mb-4" style={{ fontSize: '2.4rem', color: 'var(--espresso)', fontWeight: 400 }}>
+          {status === 'confirmed' ? 'Wir freuen uns!' : 'Schade, aber okay!'}
+        </h2>
+        <p className="f-sans mb-10" style={{ fontSize: '0.95rem', color: 'var(--muted)', lineHeight: 1.9 }}>
+          {status === 'confirmed'
+            ? `Vielen Dank, ${form.name}! Wir freuen uns sehr darauf, diesen besonderen Tag mit euch zu teilen.`
+            : `Danke für die Nachricht, ${form.name}. Ihr werdet uns fehlen!`}
+        </p>
+        <div className="ornament w-24 mx-auto mb-10">
+          <span style={{ color: 'var(--honey)', fontSize: '0.5rem', letterSpacing: '0.7em' }}>✦ ✦ ✦</span>
+        </div>
+        <p className="f-script mb-8" style={{ fontSize: '3rem', color: 'var(--honey)' }}>Eileen &amp; Eduard</p>
+        <Link href="/" className="eyebrow inline-flex items-center gap-2 hover:text-[var(--honey)] transition-colors" style={{ color: 'var(--muted)' }}>
+          <ArrowLeft size={14} /> Zurück zur Startseite
+        </Link>
+      </div>
+    </div>
+  )
+
+  /* ── Formular ──────────────────────────────── */
+  return (
+    <div className="min-h-screen py-24 px-6" style={{ background: 'var(--linen)' }}>
+      <div className="max-w-xl mx-auto">
+
+        <Link href="/" className="eyebrow inline-flex items-center gap-2 mb-14 hover:text-[var(--honey)] transition-colors" style={{ color: 'var(--muted)' }}>
+          <ArrowLeft size={14} /> Zurück
         </Link>
 
-        <div className="text-center mb-12">
-          <p className="font-body text-xs tracking-[0.4em] uppercase mb-4" style={{ color: 'var(--terracotta)' }}>
-            10. Juli 2026
-          </p>
-          <h1
-            className="font-script leading-none mb-4"
-            style={{ fontSize: 'clamp(3.5rem, 10vw, 6rem)', color: 'var(--dark-brown)' }}
-          >
+        {/* Headline */}
+        <div className="text-center mb-14">
+          <p className="eyebrow mb-4">10. Juli 2026</p>
+          <h1 className="f-script leading-none mb-4" style={{ fontSize: 'clamp(3.5rem, 10vw, 6rem)', color: 'var(--bark)' }}>
             Seid ihr dabei?
           </h1>
-          <p className="font-body font-light" style={{ color: 'var(--muted)' }}>
+          <p className="f-sans" style={{ fontSize: '0.88rem', color: 'var(--muted)' }}>
             Bitte antwortet bis zum 27. Mai 2026
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
-          {/* Zu/Absage Auswahl */}
-          <div className="grid grid-cols-2 gap-4">
-            <button
-              type="button"
-              onClick={() => setStatus('confirmed')}
-              className="py-6 flex flex-col items-center gap-3 border-2 rounded-sm transition-all"
-              style={{
-                borderColor: status === 'confirmed' ? 'var(--terracotta)' : 'rgba(184,148,74,0.3)',
-                background: status === 'confirmed' ? 'rgba(200,149,108,0.1)' : 'transparent',
-              }}
-            >
-              <Check size={28} style={{ color: status === 'confirmed' ? 'var(--terracotta)' : 'var(--muted)' }} />
-              <span className="font-body text-sm tracking-widest uppercase" style={{ color: status === 'confirmed' ? 'var(--terracotta)' : 'var(--muted)' }}>
-                Ich bin dabei!
-              </span>
-            </button>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-10">
 
-            <button
-              type="button"
-              onClick={() => setStatus('declined')}
-              className="py-6 flex flex-col items-center gap-3 border-2 rounded-sm transition-all"
-              style={{
-                borderColor: status === 'declined' ? 'var(--dark-brown)' : 'rgba(184,148,74,0.3)',
-                background: status === 'declined' ? 'rgba(74,55,40,0.1)' : 'transparent',
-              }}
-            >
-              <X size={28} style={{ color: status === 'declined' ? 'var(--dark-brown)' : 'var(--muted)' }} />
-              <span className="font-body text-sm tracking-widest uppercase" style={{ color: status === 'declined' ? 'var(--dark-brown)' : 'var(--muted)' }}>
-                Leider nicht
-              </span>
-            </button>
+          {/* Zu-/Absage */}
+          <div className="grid grid-cols-2 gap-4">
+            {([
+              { val: 'confirmed', icon: <Check size={22} />, label: 'Ich bin dabei!' },
+              { val: 'declined',  icon: <X    size={22} />, label: 'Leider nicht' },
+            ] as const).map(opt => (
+              <button
+                key={opt.val}
+                type="button"
+                onClick={() => setStatus(opt.val)}
+                className="py-7 flex flex-col items-center gap-3 border transition-all"
+                style={{
+                  borderColor: status === opt.val ? 'var(--caramel)' : 'var(--sand)',
+                  background:  status === opt.val ? 'rgba(166,124,82,0.08)' : '#fff',
+                  color: status === opt.val ? 'var(--caramel)' : 'var(--muted)',
+                }}
+              >
+                {opt.icon}
+                <span className="eyebrow" style={{ fontSize: '0.62rem', color: 'inherit' }}>{opt.label}</span>
+              </button>
+            ))}
           </div>
 
           {/* Name */}
           <div>
-            <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'var(--dark-brown)' }}>
-              Euer Name *
+            <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'var(--espresso)' }}>
+              Name *
             </label>
-            <input
-              type="text"
-              required
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              placeholder="Vor- und Nachname"
-              className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent transition-colors"
-              style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--dark-brown)' }}
-            />
+            <input required className="field" placeholder="Vor- und Nachname"
+              value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
           </div>
 
           {status === 'confirmed' && (
             <>
-              {/* Personen */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-6">
                 <div>
-                  <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'var(--dark-brown)' }}>
-                    Erwachsene
-                  </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={form.adults}
-                    onChange={(e) => setForm({ ...form, adults: parseInt(e.target.value) })}
-                    className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent"
-                    style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--dark-brown)' }}
-                  />
+                  <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'var(--espresso)' }}>Erwachsene</label>
+                  <input type="number" min={1} max={10} className="field"
+                    value={form.adults} onChange={e => setForm({ ...form, adults: +e.target.value })} />
                 </div>
                 <div>
-                  <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'var(--dark-brown)' }}>
-                    Kinder
-                  </label>
-                  <input
-                    type="number"
-                    min={0}
-                    max={10}
-                    value={form.children}
-                    onChange={(e) => setForm({ ...form, children: parseInt(e.target.value) })}
-                    className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent"
-                    style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--dark-brown)' }}
-                  />
+                  <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'var(--espresso)' }}>Kinder</label>
+                  <input type="number" min={0} max={10} className="field"
+                    value={form.children} onChange={e => setForm({ ...form, children: +e.target.value })} />
                 </div>
               </div>
 
-              {/* Dietary */}
               <div>
-                <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'var(--dark-brown)' }}>
-                  Besondere Ernährungswünsche
+                <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'var(--espresso)' }}>
+                  Ernährungswünsche
                 </label>
-                <input
-                  type="text"
-                  value={form.dietary_notes}
-                  onChange={(e) => setForm({ ...form, dietary_notes: e.target.value })}
-                  placeholder="z.B. vegetarisch, vegan, Allergien..."
-                  className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent"
-                  style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--dark-brown)' }}
-                />
+                <input className="field" placeholder="z. B. vegetarisch, vegan, Allergien..."
+                  value={form.dietary_notes} onChange={e => setForm({ ...form, dietary_notes: e.target.value })} />
               </div>
             </>
           )}
 
-          {/* Email/Telefon */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'var(--dark-brown)' }}>
-                E-Mail
-              </label>
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="eure@email.de"
-                className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent"
-                style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--dark-brown)' }}
-              />
+              <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'var(--espresso)' }}>E-Mail</label>
+              <input type="email" className="field" placeholder="eure@email.de"
+                value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
             </div>
             <div>
-              <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'var(--dark-brown)' }}>
-                Telefon
-              </label>
-              <input
-                type="tel"
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="Eure Telefonnummer"
-                className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent"
-                style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--dark-brown)' }}
-              />
+              <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'var(--espresso)' }}>Telefon</label>
+              <input type="tel" className="field" placeholder="Telefonnummer"
+                value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
             </div>
           </div>
 
-          {/* Nachricht */}
           <div>
-            <label className="font-body text-xs tracking-widest uppercase block mb-2" style={{ color: 'var(--dark-brown)' }}>
+            <label className="eyebrow block mb-2" style={{ fontSize: '0.6rem', color: 'var(--espresso)' }}>
               Nachricht ans Brautpaar
             </label>
-            <textarea
-              rows={4}
-              value={form.message}
-              onChange={(e) => setForm({ ...form, message: e.target.value })}
-              placeholder="Eure persönlichen Worte..."
-              className="w-full px-4 py-3 font-body font-light text-sm outline-none border-b-2 bg-transparent resize-none"
-              style={{ borderColor: 'rgba(184,148,74,0.4)', color: 'var(--dark-brown)' }}
-            />
+            <textarea rows={4} className="field resize-none" placeholder="Eure persönlichen Worte..."
+              value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} />
           </div>
 
-          {error && (
-            <p className="font-body text-sm text-center" style={{ color: 'var(--terracotta)' }}>
-              {error}
-            </p>
-          )}
+          {error && <p className="f-sans text-sm text-center" style={{ color: 'var(--rose)' }}>{error}</p>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="py-4 font-body text-sm tracking-widest uppercase transition-all hover:opacity-90 disabled:opacity-50"
-            style={{
-              background: 'var(--terracotta)',
-              color: 'white',
-              borderRadius: '2px',
-              letterSpacing: '0.2em',
-            }}
-          >
-            {loading ? 'Wird gesendet...' : 'Absenden'}
+          <button type="submit" disabled={loading} className="btn-primary w-full text-center disabled:opacity-50">
+            {loading ? 'Wird gesendet…' : 'Absenden'}
           </button>
         </form>
       </div>

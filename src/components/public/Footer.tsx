@@ -4,25 +4,30 @@ import Link from 'next/link'
 
 export default function Footer() {
   return (
-    <footer className="py-12 px-6 text-center" style={{ background: 'var(--beige)', borderTop: '1px solid rgba(184,148,74,0.2)' }}>
-      <div className="max-w-4xl mx-auto">
-        <p className="font-script text-4xl mb-4" style={{ color: 'var(--gold)' }}>
-          Eileen & Eduard
+    <footer className="py-16 px-6 text-center" style={{ background: 'var(--warm-white)', borderTop: '1px solid var(--sand)' }}>
+      <div className="max-w-xl mx-auto">
+
+        <p className="f-script mb-3" style={{ fontSize: '3.5rem', color: 'var(--honey)', lineHeight: 1 }}>
+          Eileen &amp; Eduard
         </p>
-        <p className="font-body font-light text-sm tracking-widest uppercase" style={{ color: 'var(--muted)' }}>
+
+        <p className="eyebrow mb-8" style={{ color: 'var(--muted)', letterSpacing: '0.35em' }}>
           10 · 07 · 2026
         </p>
-        <div className="gold-divider w-32 mx-auto my-6">
-          <span style={{ color: 'var(--gold)', fontSize: '0.8rem' }}>✦</span>
+
+        <div className="ornament w-32 mx-auto mb-8">
+          <span style={{ color: 'var(--sand)', fontSize: '0.5rem', letterSpacing: '0.8em' }}>✦ ✦ ✦</span>
         </div>
-        <p className="font-body font-light text-xs" style={{ color: 'var(--muted)' }}>
+
+        <p className="f-sans mb-6" style={{ fontSize: '0.8rem', color: 'var(--muted)', lineHeight: 1.8 }}>
           Mit Liebe gestaltet für unseren besonderen Tag
         </p>
-        <div className="flex justify-center gap-6 mt-4">
-          <Link href="/rsvp" className="font-body text-xs tracking-widest uppercase hover:opacity-70" style={{ color: 'var(--terracotta)' }}>
+
+        <div className="flex justify-center gap-8">
+          <Link href="/rsvp" className="eyebrow hover:text-[var(--honey)] transition-colors" style={{ color: 'var(--caramel)' }}>
             RSVP
           </Link>
-          <Link href="/login" className="font-body text-xs tracking-widest uppercase hover:opacity-70" style={{ color: 'var(--muted)' }}>
+          <Link href="/login" className="eyebrow hover:text-[var(--honey)] transition-colors" style={{ color: 'var(--muted)' }}>
             Login
           </Link>
         </div>

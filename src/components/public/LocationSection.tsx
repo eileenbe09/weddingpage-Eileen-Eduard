@@ -1,106 +1,102 @@
 'use client'
 
-import { MapPin, Clock, Car } from 'lucide-react'
+import { MapPin, Clock } from 'lucide-react'
 
-const locations = [
+const locs = [
   {
-    name: 'St. Matthäus Kirche',
-    subtitle: 'Kirchliche Trauung',
+    label:   'Kirchliche Trauung',
+    name:    'St. Matthäus Kirche',
     address: 'Wulfen',
-    time: '15:00 Uhr',
-    icon: '⛪',
-    mapsQuery: 'St.+Matthäus+Kirche+Wulfen',
+    time:    '15:00 Uhr',
+    q:       'St.+Matthäus+Kirche+Wulfen',
   },
   {
-    name: 'Hecheltjens Hof',
-    subtitle: 'Sektempfang & Feier',
+    label:   'Sektempfang & Feier',
+    name:    'Hecheltjens Hof',
     address: 'Isseltalweg 9, 46499 Hamminkeln',
-    time: 'ab 17:00 Uhr',
-    icon: '🌿',
-    mapsQuery: 'Hecheltjens+Hof+Isseltalweg+9+Hamminkeln',
+    time:    'ab 17:00 Uhr',
+    q:       'Hecheltjens+Hof+Isseltalweg+9+Hamminkeln',
   },
 ]
 
 export default function LocationSection() {
   return (
-    <section id="location" className="py-24 px-6" style={{ background: 'var(--cream)' }}>
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-16">
-          <p className="font-body text-xs tracking-[0.4em] uppercase mb-4" style={{ color: 'var(--terracotta)' }}>
-            Wo wir feiern
-          </p>
-          <h2 className="font-heading font-light" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', color: 'var(--dark-brown)' }}>
-            Locations
+    <section id="location" className="py-28 px-6" style={{ background: 'var(--linen)' }}>
+      <div className="max-w-5xl mx-auto">
+
+        {/* Header */}
+        <div className="text-center mb-20">
+          <p className="eyebrow mb-5">Wo wir feiern</p>
+          <h2
+            className="f-serif"
+            style={{ fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', color: 'var(--espresso)', fontWeight: 400 }}
+          >
+            Unsere Locations
           </h2>
-          <div className="gold-divider w-32 mx-auto mt-4">
-            <span style={{ color: 'var(--gold)', fontSize: '0.8rem' }}>✦</span>
+          <div className="ornament w-28 mx-auto mt-6">
+            <span style={{ color: 'var(--honey)', fontSize: '0.55rem', letterSpacing: '0.6em' }}>✦ ✦ ✦</span>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
-          {locations.map((loc, i) => (
-            <div
-              key={i}
-              className="p-8 rounded-sm transition-shadow hover:shadow-lg"
-              style={{ background: 'var(--beige)', border: '1px solid rgba(184,148,74,0.2)' }}
-            >
-              <div className="text-4xl mb-4">{loc.icon}</div>
-              <p className="font-body text-xs tracking-widest uppercase mb-2" style={{ color: 'var(--terracotta)' }}>
-                {loc.subtitle}
-              </p>
-              <h3 className="font-heading text-2xl font-semibold mb-4" style={{ color: 'var(--dark-brown)' }}>
-                {loc.name}
+        {/* Cards */}
+        <div className="grid md:grid-cols-2 gap-6 mb-12">
+          {locs.map((l, i) => (
+            <div key={i} className="card p-10" style={{ background: 'var(--warm-white)' }}>
+              <p className="eyebrow mb-4" style={{ color: 'var(--rose)' }}>{l.label}</p>
+
+              <h3
+                className="f-serif mb-6"
+                style={{ fontSize: 'clamp(1.6rem, 3vw, 2.2rem)', color: 'var(--espresso)', fontWeight: 500 }}
+              >
+                {l.name}
               </h3>
 
-              <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-3 mb-8">
                 <div className="flex items-start gap-3">
-                  <MapPin size={16} className="mt-0.5 flex-shrink-0" style={{ color: 'var(--gold)' }} />
-                  <span className="font-body font-light text-sm" style={{ color: 'var(--muted)' }}>
-                    {loc.address}
+                  <MapPin size={14} style={{ color: 'var(--honey)', marginTop: '3px', flexShrink: 0 }} />
+                  <span className="f-sans" style={{ fontSize: '0.88rem', color: 'var(--muted)', lineHeight: 1.6 }}>
+                    {l.address}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Clock size={16} style={{ color: 'var(--gold)' }} />
-                  <span className="font-body font-light text-sm" style={{ color: 'var(--muted)' }}>
-                    {loc.time}
+                  <Clock size={14} style={{ color: 'var(--honey)', flexShrink: 0 }} />
+                  <span className="f-sans" style={{ fontSize: '0.88rem', color: 'var(--muted)' }}>
+                    {l.time}
                   </span>
                 </div>
               </div>
 
               <a
-                href={`https://maps.google.com/?q=${loc.mapsQuery}`}
+                href={`https://maps.google.com/?q=${l.q}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 mt-6 font-body text-xs tracking-widest uppercase transition-colors hover:opacity-70"
-                style={{ color: 'var(--terracotta)' }}
+                className="btn-outline"
+                style={{ padding: '0.6rem 1.6rem', fontSize: '0.65rem' }}
               >
-                <Car size={14} />
                 Route planen
               </a>
             </div>
           ))}
         </div>
 
-        {/* Embedded Map Placeholder */}
+        {/* Map-Placeholder */}
         <div
-          className="mt-8 w-full h-64 rounded-sm flex items-center justify-center"
-          style={{ background: 'var(--beige)', border: '1px solid rgba(184,148,74,0.2)' }}
+          className="w-full flex flex-col items-center justify-center py-16 gap-4"
+          style={{ background: 'var(--sand)', border: '1px solid var(--honey)' }}
         >
-          <div className="text-center">
-            <MapPin size={32} style={{ color: 'var(--gold)', margin: '0 auto' }} />
-            <p className="font-body font-light text-sm mt-3" style={{ color: 'var(--muted)' }}>
-              Hecheltjens Hof · Isseltalweg 9 · 46499 Hamminkeln
-            </p>
-            <a
-              href="https://maps.google.com/?q=Isseltalweg+9+Hamminkeln"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-3 font-body text-xs tracking-widest uppercase px-4 py-2 border transition-colors hover:opacity-70"
-              style={{ borderColor: 'var(--gold)', color: 'var(--gold)', borderRadius: '2px' }}
-            >
-              In Google Maps öffnen
-            </a>
-          </div>
+          <MapPin size={28} style={{ color: 'var(--caramel)' }} />
+          <p className="f-serif" style={{ fontSize: '1.05rem', color: 'var(--bark)', fontWeight: 400 }}>
+            Hecheltjens Hof · Isseltalweg 9 · 46499 Hamminkeln
+          </p>
+          <a
+            href="https://maps.google.com/?q=Isseltalweg+9+46499+Hamminkeln"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="eyebrow mt-1 hover:text-[var(--bark)] transition-colors"
+            style={{ color: 'var(--caramel)', textDecoration: 'underline', textUnderlineOffset: '4px' }}
+          >
+            In Google Maps öffnen
+          </a>
         </div>
       </div>
     </section>

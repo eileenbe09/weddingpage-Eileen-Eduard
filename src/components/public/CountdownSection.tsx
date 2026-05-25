@@ -4,58 +4,64 @@ import { useState, useEffect } from 'react'
 import { getCountdown } from '@/lib/utils'
 
 export default function CountdownSection() {
-  const [countdown, setCountdown] = useState(getCountdown())
+  const [cd, setCd] = useState(getCountdown())
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCountdown(getCountdown())
-    }, 1000)
-    return () => clearInterval(interval)
+    const t = setInterval(() => setCd(getCountdown()), 1000)
+    return () => clearInterval(t)
   }, [])
 
   const units = [
-    { value: countdown.days, label: 'Tage' },
-    { value: countdown.hours, label: 'Stunden' },
-    { value: countdown.minutes, label: 'Minuten' },
-    { value: countdown.seconds, label: 'Sekunden' },
+    { v: cd.days,    l: 'Tage' },
+    { v: cd.hours,   l: 'Stunden' },
+    { v: cd.minutes, l: 'Minuten' },
+    { v: cd.seconds, l: 'Sekunden' },
   ]
 
   return (
-    <section className="py-20 px-6" style={{ background: 'var(--dark-brown)' }}>
-      <div className="max-w-4xl mx-auto text-center">
-        <p
-          className="font-body text-xs tracking-[0.4em] uppercase mb-8"
-          style={{ color: 'var(--terracotta)' }}
-        >
+    <section className="py-28 px-6" style={{ background: 'var(--espresso)' }}>
+      <div className="max-w-5xl mx-auto text-center">
+
+        <p className="eyebrow mb-6" style={{ color: 'var(--honey)' }}>
           Noch bis zu unserem großen Tag
         </p>
 
-        <div className="flex items-center justify-center gap-4 md:gap-12 flex-wrap">
-          {units.map((unit, i) => (
-            <div key={i} className="flex flex-col items-center">
+        {/* Countdown Zahlen */}
+        <div className="flex items-end justify-center gap-2 md:gap-10 flex-wrap">
+          {units.map((u, i) => (
+            <div key={i} className="flex flex-col items-center" style={{ minWidth: '80px' }}>
               <span
-                className="font-heading font-light tabular-nums"
-                style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', color: 'var(--cream)', lineHeight: 1 }}
+                className="f-serif tabular-nums"
+                style={{
+                  fontSize: 'clamp(3.5rem, 10vw, 7rem)',
+                  color: 'var(--warm-white)',
+                  lineHeight: 1,
+                  fontWeight: 400,
+                }}
               >
-                {String(unit.value).padStart(2, '0')}
+                {String(u.v).padStart(2, '0')}
               </span>
-              <span
-                className="font-body text-xs tracking-[0.3em] uppercase mt-2"
-                style={{ color: 'var(--muted)' }}
-              >
-                {unit.label}
+              <span className="eyebrow mt-3" style={{ color: 'var(--honey)', fontSize: '0.6rem', letterSpacing: '0.3em' }}>
+                {u.l}
               </span>
             </div>
           ))}
         </div>
 
-        <div className="gold-divider w-48 mx-auto mt-12">
-          <span style={{ color: 'var(--gold)' }}>✦</span>
-        </div>
+        {/* Divider */}
+        <div className="ornament w-40 mx-auto mt-16 mb-10" style={{ opacity: 0.4 }} />
 
+        {/* Zitat */}
         <p
-          className="font-heading font-light italic text-xl mt-8"
-          style={{ color: 'rgba(253,250,245,0.7)' }}
+          className="f-serif italic"
+          style={{
+            fontSize: 'clamp(1rem, 2.5vw, 1.35rem)',
+            color: 'rgba(242,234,217,0.7)',
+            fontWeight: 400,
+            maxWidth: '560px',
+            margin: '0 auto',
+            lineHeight: 1.8,
+          }}
         >
           „Das größte Geschenk für uns ist, unseren Tag mit euch zu verbringen."
         </p>

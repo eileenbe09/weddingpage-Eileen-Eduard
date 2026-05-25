@@ -1,82 +1,132 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Great+Vibes&family=Raleway:wght@300;400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&family=Jost:wght@200;300;400;500&display=swap');
 
 :root {
-  --background: #FDFAF5;
-  --foreground: #3A2A1E;
-  --cream: #FDFAF5;
-  --beige: #F0E8D8;
-  --terracotta: #C8956C;
-  --gold: #B8944A;
-  --dark-brown: #4A3728;
-  --muted: #8C7B6B;
+  --warm-white: #FDFAF6;
+  --linen:      #F2EAD9;
+  --sand:       #E8D9C0;
+  --honey:      #C9A86C;
+  --caramel:    #A67C52;
+  --bark:       #6B4C35;
+  --espresso:   #2C1F14;
+  --muted:      #9A8470;
+  --rose:       #C4957A;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-cream: var(--cream);
-  --color-beige: var(--beige);
-  --color-terracotta: var(--terracotta);
-  --color-gold: var(--gold);
-  --color-dark-brown: var(--dark-brown);
-  --color-muted: var(--muted);
-  --font-heading: 'Cormorant Garamond', serif;
-  --font-script: 'Great Vibes', cursive;
-  --font-body: 'Raleway', sans-serif;
+  --color-background:  var(--warm-white);
+  --color-foreground:  var(--espresso);
+  --color-linen:       var(--linen);
+  --color-sand:        var(--sand);
+  --color-honey:       var(--honey);
+  --color-caramel:     var(--caramel);
+  --color-bark:        var(--bark);
+  --color-espresso:    var(--espresso);
+  --color-muted:       var(--muted);
+  --color-rose:        var(--rose);
 }
 
-* {
-  box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Raleway', sans-serif;
+  background: var(--warm-white);
+  color: var(--espresso);
+  font-family: 'Jost', sans-serif;
   font-weight: 300;
+  -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 {
-  font-family: 'Cormorant Garamond', serif;
-}
+/* ── Typo-Klassen ───────────────────────────── */
+.f-script  { font-family: 'Pinyon Script', cursive; }
+.f-serif   { font-family: 'Playfair Display', serif; }
+.f-sans    { font-family: 'Jost', sans-serif; }
 
-.font-script {
-  font-family: 'Great Vibes', cursive;
-}
-
-.font-heading {
-  font-family: 'Cormorant Garamond', serif;
-}
-
-.font-body {
-  font-family: 'Raleway', sans-serif;
-}
-
-/* Goldener Divider */
-.gold-divider {
+/* ── Eleganter Ornament-Divider ─────────────── */
+.ornament {
   display: flex;
   align-items: center;
   gap: 1rem;
-  color: var(--gold);
 }
-
-.gold-divider::before,
-.gold-divider::after {
+.ornament::before,
+.ornament::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  background: linear-gradient(90deg, transparent, var(--honey), transparent);
 }
 
-/* Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+/* ── Button-Basis ───────────────────────────── */
+.btn-primary {
+  display: inline-block;
+  padding: 0.85rem 2.5rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #fff;
+  background: var(--caramel);
+  border: 1px solid var(--caramel);
+  transition: all 0.3s ease;
 }
-::-webkit-scrollbar-track {
-  background: var(--beige);
+.btn-primary:hover { background: var(--bark); border-color: var(--bark); }
+
+.btn-outline {
+  display: inline-block;
+  padding: 0.85rem 2.5rem;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--espresso);
+  background: transparent;
+  border: 1px solid var(--espresso);
+  transition: all 0.3s ease;
 }
-::-webkit-scrollbar-thumb {
-  background: var(--terracotta);
-  border-radius: 3px;
+.btn-outline:hover { color: var(--honey); border-color: var(--honey); }
+
+/* ── Label ──────────────────────────────────── */
+.eyebrow {
+  font-family: 'Jost', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--caramel);
 }
+
+/* ── Card ───────────────────────────────────── */
+.card {
+  background: #fff;
+  border: 1px solid var(--sand);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.card:hover {
+  box-shadow: 0 8px 40px rgba(44,31,20,0.08);
+  transform: translateY(-2px);
+}
+
+/* ── Scrollbar ──────────────────────────────── */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--linen); }
+::-webkit-scrollbar-thumb { background: var(--honey); border-radius: 10px; }
+
+/* ── Formfelder ─────────────────────────────── */
+.field {
+  width: 100%;
+  padding: 0.75rem 0;
+  font-family: 'Jost', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--espresso);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--sand);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field:focus { border-color: var(--honey); }
+.field::placeholder { color: var(--muted); }

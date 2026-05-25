@@ -5,110 +5,73 @@ import Link from 'next/link'
 export default function HeroSection() {
   return (
     <section
-      className="relative min-h-screen flex flex-col items-center justify-center text-center px-6 overflow-hidden"
-      style={{ background: 'linear-gradient(180deg, var(--cream) 0%, var(--beige) 100%)' }}
+      className="relative min-h-screen flex flex-col items-center justify-center text-center overflow-hidden px-6"
+      style={{ background: 'linear-gradient(160deg, var(--warm-white) 0%, var(--linen) 60%, var(--sand) 100%)' }}
     >
-      {/* Decorative Pampas SVG Background */}
-      <div className="absolute inset-0 pointer-events-none select-none overflow-hidden">
-        <svg
-          className="absolute -top-10 -left-10 w-80 h-80 opacity-20"
-          viewBox="0 0 300 300"
-          fill="none"
-        >
-          <ellipse cx="150" cy="80" rx="8" ry="120" fill="#C8956C" transform="rotate(-20 150 80)" />
-          <ellipse cx="150" cy="80" rx="6" ry="100" fill="#B8944A" transform="rotate(10 150 80)" />
-          <ellipse cx="150" cy="80" rx="5" ry="90" fill="#C8956C" transform="rotate(-35 150 80)" />
-          <ellipse cx="150" cy="80" rx="4" ry="80" fill="#8B6914" transform="rotate(25 150 80)" />
-        </svg>
-        <svg
-          className="absolute -bottom-10 -right-10 w-96 h-96 opacity-20"
-          viewBox="0 0 300 300"
-          fill="none"
-        >
-          <ellipse cx="150" cy="220" rx="8" ry="120" fill="#C8956C" transform="rotate(20 150 220)" />
-          <ellipse cx="150" cy="220" rx="6" ry="100" fill="#B8944A" transform="rotate(-10 150 220)" />
-          <ellipse cx="150" cy="220" rx="5" ry="90" fill="#C8956C" transform="rotate(35 150 220)" />
-          <ellipse cx="150" cy="220" rx="4" ry="80" fill="#8B6914" transform="rotate(-25 150 220)" />
-        </svg>
+      {/* Dekorative Kreise im Hintergrund */}
+      <div
+        className="absolute -top-32 -right-32 w-[500px] h-[500px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(201,168,108,0.12) 0%, transparent 70%)' }}
+      />
+      <div
+        className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full pointer-events-none"
+        style={{ background: 'radial-gradient(circle, rgba(164,124,82,0.1) 0%, transparent 70%)' }}
+      />
+
+      {/* Dünne dekorative Linien */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute top-[15%] left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 5%, var(--sand) 30%, var(--sand) 70%, transparent 95%)' }} />
+        <div className="absolute bottom-[15%] left-0 right-0 h-px" style={{ background: 'linear-gradient(90deg, transparent 5%, var(--sand) 30%, var(--sand) 70%, transparent 95%)' }} />
       </div>
 
-      <div className="relative z-10 flex flex-col items-center gap-6 max-w-3xl">
-        <p
-          className="font-body text-xs tracking-[0.4em] uppercase"
-          style={{ color: 'var(--terracotta)' }}
-        >
+      <div className="relative z-10 flex flex-col items-center" style={{ gap: '1.6rem', maxWidth: '800px' }}>
+
+        {/* Eyebrow */}
+        <p className="eyebrow" style={{ letterSpacing: '0.45em' }}>
           Wir heiraten
         </p>
 
+        {/* Script Name */}
         <h1
-          className="font-script leading-none"
-          style={{ fontSize: 'clamp(4rem, 12vw, 9rem)', color: 'var(--dark-brown)' }}
+          className="f-script leading-none"
+          style={{
+            fontSize: 'clamp(4.5rem, 14vw, 10rem)',
+            color: 'var(--bark)',
+            lineHeight: 1.05,
+          }}
         >
-          Unsere Hochzeit
+          Eileen &amp; Eduard
         </h1>
 
-        <div className="gold-divider w-64">
-          <span className="font-heading text-lg" style={{ color: 'var(--gold)' }}>✦</span>
+        {/* Ornament */}
+        <div className="ornament w-56 mx-auto">
+          <span style={{ color: 'var(--honey)', fontSize: '0.6rem', letterSpacing: '0.5em' }}>✦ ✦ ✦</span>
         </div>
 
-        <h2
-          className="font-heading font-light"
-          style={{ fontSize: 'clamp(1.8rem, 5vw, 3.5rem)', color: 'var(--dark-brown)', letterSpacing: '0.05em' }}
-        >
-          Eileen & Eduard
-        </h2>
-
+        {/* Datum */}
         <p
-          className="font-body font-light text-lg tracking-[0.3em] uppercase"
-          style={{ color: 'var(--muted)' }}
+          className="f-serif"
+          style={{ fontSize: 'clamp(1.1rem, 3vw, 1.6rem)', color: 'var(--espresso)', fontWeight: 400, letterSpacing: '0.12em' }}
         >
-          10 · 07 · 2026
+          10. Juli 2026
         </p>
 
-        <p
-          className="font-body font-light text-base mt-2"
-          style={{ color: 'var(--muted)' }}
-        >
-          St. Matthäus Kirche Wulfen
+        {/* Ort */}
+        <p className="f-sans" style={{ fontSize: '0.85rem', color: 'var(--muted)', letterSpacing: '0.15em', fontWeight: 300 }}>
+          St. Matthäus Kirche · Wulfen
         </p>
 
-        <div className="flex gap-4 mt-6 flex-wrap justify-center">
-          <Link
-            href="/rsvp"
-            className="px-8 py-3 font-body text-sm tracking-widest uppercase transition-all hover:opacity-90"
-            style={{
-              background: 'var(--terracotta)',
-              color: 'white',
-              borderRadius: '2px',
-              letterSpacing: '0.15em',
-            }}
-          >
-            Zusagen
-          </Link>
-          <a
-            href="#programm"
-            className="px-8 py-3 font-body text-sm tracking-widest uppercase border transition-all hover:opacity-70"
-            style={{
-              borderColor: 'var(--dark-brown)',
-              color: 'var(--dark-brown)',
-              borderRadius: '2px',
-              letterSpacing: '0.15em',
-            }}
-          >
-            Zum Ablauf
-          </a>
+        {/* Buttons */}
+        <div className="flex gap-4 mt-4 flex-wrap justify-center">
+          <Link href="/rsvp" className="btn-primary">Zusagen</Link>
+          <a href="#programm" className="btn-outline">Zum Ablauf</a>
         </div>
       </div>
 
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-        <span className="font-body text-xs tracking-widest uppercase" style={{ color: 'var(--muted)' }}>
-          Scroll
-        </span>
-        <div
-          className="w-px h-12 animate-pulse"
-          style={{ background: 'linear-gradient(to bottom, var(--gold), transparent)' }}
-        />
+      {/* Scroll-Pfeil */}
+      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+        <span className="eyebrow" style={{ fontSize: '0.55rem', letterSpacing: '0.4em', color: 'var(--muted)' }}>Scroll</span>
+        <div style={{ width: '1px', height: '48px', background: 'linear-gradient(to bottom, var(--honey), transparent)' }} />
       </div>
     </section>
   )
