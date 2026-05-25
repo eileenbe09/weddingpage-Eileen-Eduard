@@ -5,9 +5,10 @@ import Link from 'next/link'
 import { Menu, X } from 'lucide-react'
 
 const links = [
-  { href: '#programm', label: 'Programm' },
-  { href: '#location', label: 'Location' },
-  { href: '#rsvp',     label: 'RSVP' },
+  { href: '#programm',     label: 'Programm' },
+  { href: '#location',     label: 'Location' },
+  { href: '#unterkuenfte', label: 'Hotels' },
+  { href: '#faq',          label: 'FAQ' },
 ]
 
 export default function Navigation() {
