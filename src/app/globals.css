@@ -1,132 +1,115 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Pinyon+Script&family=Jost:wght@200;300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500;1,600&family=Montserrat:wght@200;300;400;500&family=Great+Vibes&display=swap');
 
+/* ── Farbpalette ────────────────────────────── */
 :root {
-  --warm-white: #FDFAF6;
-  --linen:      #F2EAD9;
-  --sand:       #E8D9C0;
-  --honey:      #C9A86C;
-  --caramel:    #A67C52;
-  --bark:       #6B4C35;
-  --espresso:   #2C1F14;
-  --muted:      #9A8470;
-  --rose:       #C4957A;
-}
-
-@theme inline {
-  --color-background:  var(--warm-white);
-  --color-foreground:  var(--espresso);
-  --color-linen:       var(--linen);
-  --color-sand:        var(--sand);
-  --color-honey:       var(--honey);
-  --color-caramel:     var(--caramel);
-  --color-bark:        var(--bark);
-  --color-espresso:    var(--espresso);
-  --color-muted:       var(--muted);
-  --color-rose:        var(--rose);
+  --ivory:    #FAF7F2;
+  --linen:    #F0E8D8;
+  --sand:     #DFD0B8;
+  --gold:     #B8944A;
+  --sienna:   #9C6B3C;
+  --mahogany: #5C3D2E;
+  --espresso: #1E140A;
+  --smoke:    #8A7A6A;
+  --rose:     #C4856A;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
 
 body {
-  background: var(--warm-white);
+  background: var(--ivory);
   color: var(--espresso);
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-weight: 300;
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── Typo-Klassen ───────────────────────────── */
-.f-script  { font-family: 'Pinyon Script', cursive; }
-.f-serif   { font-family: 'Playfair Display', serif; }
-.f-sans    { font-family: 'Jost', sans-serif; }
+/* ── Schriftklassen ─────────────────────────── */
+.f-display { font-family: 'Cormorant Garamond', serif; }
+.f-accent  { font-family: 'Great Vibes', cursive; }
+.f-ui      { font-family: 'Montserrat', sans-serif; }
 
-/* ── Eleganter Ornament-Divider ─────────────── */
+/* ── Ornament-Linie ─────────────────────────── */
 .ornament {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 12px;
+  color: var(--gold);
 }
 .ornament::before,
 .ornament::after {
   content: '';
   flex: 1;
   height: 1px;
-  background: linear-gradient(90deg, transparent, var(--honey), transparent);
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
-/* ── Button-Basis ───────────────────────────── */
-.btn-primary {
+/* ── Primär-Button ──────────────────────────── */
+.btn {
   display: inline-block;
-  padding: 0.85rem 2.5rem;
-  font-family: 'Jost', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 400;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: #fff;
-  background: var(--caramel);
-  border: 1px solid var(--caramel);
-  transition: all 0.3s ease;
-}
-.btn-primary:hover { background: var(--bark); border-color: var(--bark); }
-
-.btn-outline {
-  display: inline-block;
-  padding: 0.85rem 2.5rem;
-  font-family: 'Jost', sans-serif;
-  font-size: 0.7rem;
-  font-weight: 400;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--espresso);
-  background: transparent;
-  border: 1px solid var(--espresso);
-  transition: all 0.3s ease;
-}
-.btn-outline:hover { color: var(--honey); border-color: var(--honey); }
-
-/* ── Label ──────────────────────────────────── */
-.eyebrow {
-  font-family: 'Jost', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   font-size: 0.65rem;
-  font-weight: 400;
-  letter-spacing: 0.35em;
+  font-weight: 500;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: var(--caramel);
+  padding: 0.9rem 2.2rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.btn-filled {
+  background: var(--mahogany);
+  color: #fff;
+  border: 1px solid var(--mahogany);
+}
+.btn-filled:hover { background: var(--espresso); border-color: var(--espresso); }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--espresso);
+  border: 1px solid var(--espresso);
+}
+.btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
+
+/* ── Eyebrow-Label ──────────────────────────── */
+.eyebrow {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--sienna);
 }
 
 /* ── Card ───────────────────────────────────── */
 .card {
   background: #fff;
   border: 1px solid var(--sand);
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  transition: box-shadow 0.3s, transform 0.3s;
 }
 .card:hover {
-  box-shadow: 0 8px 40px rgba(44,31,20,0.08);
-  transform: translateY(-2px);
+  box-shadow: 0 12px 48px rgba(30,20,10,0.09);
+  transform: translateY(-3px);
 }
-
-/* ── Scrollbar ──────────────────────────────── */
-::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: var(--linen); }
-::-webkit-scrollbar-thumb { background: var(--honey); border-radius: 10px; }
 
 /* ── Formfelder ─────────────────────────────── */
 .field {
   width: 100%;
-  padding: 0.75rem 0;
-  font-family: 'Jost', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 300;
-  color: var(--espresso);
   background: transparent;
   border: none;
   border-bottom: 1px solid var(--sand);
+  padding: 0.7rem 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 300;
+  color: var(--espresso);
   outline: none;
   transition: border-color 0.2s;
 }
-.field:focus { border-color: var(--honey); }
-.field::placeholder { color: var(--muted); }
+.field:focus { border-color: var(--gold); }
+.field::placeholder { color: var(--smoke); font-size: 0.82rem; }
+
+/* ── Scrollbar ──────────────────────────────── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--linen); }
+::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }

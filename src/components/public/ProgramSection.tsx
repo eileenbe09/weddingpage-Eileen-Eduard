@@ -1,84 +1,77 @@
 'use client'
 
 const items = [
-  { time: '14:45', title: 'Treffen vor der Kirche',  sub: 'Wir freuen uns, euch zu begrüßen.' },
-  { time: '15:00', title: 'Kirchliche Trauung',       sub: 'St. Matthäus Kirche, Wulfen' },
-  { time: '17:00', title: 'Sektempfang',              sub: 'Hecheltjens Hof, Hamminkeln' },
-  { time: '18:00', title: 'Beginn der Feier',         sub: 'Gemeinsam feiern wir den schönsten Tag.' },
+  { time: '14:45', title: 'Treffen vor der Kirche',  desc: 'Wir freuen uns, euch zu begrüßen und gemeinsam diesen Moment zu erleben.' },
+  { time: '15:00', title: 'Kirchliche Trauung',      desc: 'St. Matthäus Kirche in Wulfen' },
+  { time: '17:00', title: 'Sektempfang',             desc: 'Hecheltjens Hof · Isseltalweg 9 · Hamminkeln' },
+  { time: '18:00', title: 'Beginn der Feier',        desc: 'Gemeinsam feiern wir den schönsten Tag unseres Lebens.' },
 ]
 
 export default function ProgramSection() {
   return (
-    <section id="programm" className="py-28 px-6" style={{ background: 'var(--warm-white)' }}>
-      <div className="max-w-3xl mx-auto">
+    <section id="programm" style={{ background: 'var(--ivory)', padding: '7rem 1.5rem' }}>
+      <div style={{ maxWidth: '720px', margin: '0 auto' }}>
 
         {/* Header */}
-        <div className="text-center mb-20">
-          <p className="eyebrow mb-5">Der Ablauf</p>
+        <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
+          <p className="eyebrow" style={{ marginBottom: '1.2rem' }}>Der Ablauf</p>
           <h2
-            className="f-serif"
-            style={{ fontSize: 'clamp(2.2rem, 5vw, 3.8rem)', color: 'var(--espresso)', fontWeight: 400 }}
+            className="f-display"
+            style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 400, fontStyle: 'italic', color: 'var(--espresso)', lineHeight: 1.1 }}
           >
             Unser Programm
           </h2>
-          <div className="ornament w-28 mx-auto mt-6">
-            <span style={{ color: 'var(--honey)', fontSize: '0.55rem', letterSpacing: '0.6em' }}>✦ ✦ ✦</span>
+          <div className="ornament" style={{ width: '140px', margin: '1.5rem auto 0' }}>
+            <span style={{ fontSize: '0.4rem', letterSpacing: '1.2em', color: 'var(--gold)' }}>◆ ◆</span>
           </div>
         </div>
 
-        {/* Timeline */}
-        <div className="relative">
-          {/* Mittellinie */}
-          <div
-            className="absolute left-1/2 top-0 bottom-0 w-px hidden md:block"
-            style={{ background: 'linear-gradient(to bottom, transparent, var(--honey) 15%, var(--honey) 85%, transparent)', transform: 'translateX(-50%)' }}
-          />
+        {/* Timeline – linksbündig, vertikal */}
+        <div style={{ position: 'relative', paddingLeft: '2.5rem' }}>
+          {/* Vertikale Linie */}
+          <div style={{
+            position: 'absolute', left: '0', top: '8px', bottom: '8px', width: '1px',
+            background: 'linear-gradient(to bottom, transparent, var(--gold) 10%, var(--gold) 90%, transparent)',
+          }} />
 
-          <div className="flex flex-col gap-16">
-            {items.map((item, i) => (
-              <div key={i} className={`flex items-center gap-8 md:gap-0 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+          {items.map((item, i) => (
+            <div key={i} style={{ position: 'relative', marginBottom: i < items.length - 1 ? '3.5rem' : 0 }}>
+              {/* Punkt */}
+              <div style={{
+                position: 'absolute', left: '-2.5rem', top: '8px',
+                width: '10px', height: '10px', borderRadius: '50%',
+                background: 'var(--ivory)', border: '2px solid var(--gold)',
+                boxShadow: '0 0 0 3px var(--linen)',
+                transform: 'translateX(-4px)',
+              }} />
 
-                {/* Text-Block */}
-                <div className={`flex-1 md:px-12 ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                  <p className="eyebrow mb-2" style={{ color: 'var(--rose)' }}>
-                    {item.time} Uhr
-                  </p>
-                  <h3
-                    className="f-serif mb-1"
-                    style={{ fontSize: 'clamp(1.3rem, 3vw, 1.9rem)', color: 'var(--espresso)', fontWeight: 500 }}
-                  >
-                    {item.title}
-                  </h3>
-                  <p className="f-sans" style={{ fontSize: '0.88rem', color: 'var(--muted)', lineHeight: 1.7 }}>
-                    {item.sub}
-                  </p>
-                </div>
-
-                {/* Kreis-Punkt */}
-                <div
-                  className="hidden md:flex w-4 h-4 rounded-full flex-shrink-0 z-10 relative"
-                  style={{ background: 'var(--warm-white)', border: '2px solid var(--honey)', boxShadow: '0 0 0 4px var(--linen)' }}
-                />
-
-                <div className="flex-1 hidden md:block" />
-              </div>
-            ))}
-          </div>
+              <p className="eyebrow" style={{ color: 'var(--rose)', marginBottom: '0.5rem', fontSize: '0.58rem' }}>
+                {item.time} Uhr
+              </p>
+              <h3
+                className="f-display"
+                style={{ fontSize: 'clamp(1.3rem, 3vw, 1.8rem)', fontWeight: 500, color: 'var(--espresso)', marginBottom: '0.4rem', lineHeight: 1.2 }}
+              >
+                {item.title}
+              </h3>
+              <p className="f-ui" style={{ fontSize: '0.85rem', color: 'var(--smoke)', lineHeight: 1.7, fontWeight: 300 }}>
+                {item.desc}
+              </p>
+            </div>
+          ))}
         </div>
 
-        {/* Hinweis Shuttle */}
-        <div
-          className="mt-20 p-8 text-center"
-          style={{ background: 'var(--linen)', border: '1px solid var(--sand)' }}
-        >
+        {/* Shuttle-Hinweis */}
+        <div style={{
+          marginTop: '4rem', padding: '2rem 2.5rem', textAlign: 'center',
+          background: 'var(--linen)', borderLeft: '3px solid var(--gold)',
+        }}>
           <p
-            className="f-serif italic"
-            style={{ fontSize: '1.1rem', color: 'var(--bark)', fontWeight: 400, lineHeight: 1.8 }}
+            className="f-display"
+            style={{ fontSize: '1.05rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--mahogany)', lineHeight: 1.8 }}
           >
-            Für den Heimweg steht ein Shuttleservice bereit.
-          </p>
-          <p className="f-sans mt-2" style={{ fontSize: '0.8rem', color: 'var(--muted)', letterSpacing: '0.05em' }}>
-            Eure Autos dürfen gerne bis zum nächsten Tag an der Location bleiben.
+            Für den Heimweg steht ein Shuttleservice bereit —
+            eure Autos dürfen bis zum nächsten Tag bleiben.
           </p>
         </div>
       </div>

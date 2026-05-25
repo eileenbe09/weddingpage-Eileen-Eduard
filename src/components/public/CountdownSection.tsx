@@ -5,63 +5,45 @@ import { getCountdown } from '@/lib/utils'
 
 export default function CountdownSection() {
   const [cd, setCd] = useState(getCountdown())
-
   useEffect(() => {
     const t = setInterval(() => setCd(getCountdown()), 1000)
     return () => clearInterval(t)
   }, [])
 
   const units = [
-    { v: cd.days,    l: 'Tage' },
-    { v: cd.hours,   l: 'Stunden' },
-    { v: cd.minutes, l: 'Minuten' },
-    { v: cd.seconds, l: 'Sekunden' },
+    { v: cd.days, l: 'Tage' }, { v: cd.hours, l: 'Stunden' },
+    { v: cd.minutes, l: 'Minuten' }, { v: cd.seconds, l: 'Sekunden' },
   ]
 
   return (
-    <section className="py-28 px-6" style={{ background: 'var(--espresso)' }}>
-      <div className="max-w-5xl mx-auto text-center">
+    <section style={{ background: 'var(--espresso)', padding: '7rem 1.5rem' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
 
-        <p className="eyebrow mb-6" style={{ color: 'var(--honey)' }}>
+        <p className="eyebrow" style={{ color: 'var(--gold)', marginBottom: '3.5rem' }}>
           Noch bis zu unserem großen Tag
         </p>
 
-        {/* Countdown Zahlen */}
-        <div className="flex items-end justify-center gap-2 md:gap-10 flex-wrap">
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 'clamp(1.5rem, 5vw, 4rem)', flexWrap: 'wrap', alignItems: 'flex-end' }}>
           {units.map((u, i) => (
-            <div key={i} className="flex flex-col items-center" style={{ minWidth: '80px' }}>
+            <div key={i} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', minWidth: '70px' }}>
               <span
-                className="f-serif tabular-nums"
-                style={{
-                  fontSize: 'clamp(3.5rem, 10vw, 7rem)',
-                  color: 'var(--warm-white)',
-                  lineHeight: 1,
-                  fontWeight: 400,
-                }}
+                className="f-display"
+                style={{ fontSize: 'clamp(3rem, 8vw, 6rem)', fontWeight: 300, color: 'var(--ivory)', lineHeight: 1, letterSpacing: '-0.02em' }}
               >
                 {String(u.v).padStart(2, '0')}
               </span>
-              <span className="eyebrow mt-3" style={{ color: 'var(--honey)', fontSize: '0.6rem', letterSpacing: '0.3em' }}>
+              <span className="eyebrow" style={{ color: 'var(--gold)', fontSize: '0.52rem', letterSpacing: '0.3em', marginTop: '0.8rem' }}>
                 {u.l}
               </span>
             </div>
           ))}
         </div>
 
-        {/* Divider */}
-        <div className="ornament w-40 mx-auto mt-16 mb-10" style={{ opacity: 0.4 }} />
+        <div style={{ width: '160px', height: '1px', background: 'linear-gradient(90deg, transparent, rgba(184,148,74,0.4), transparent)', margin: '4rem auto 3rem' }} />
 
-        {/* Zitat */}
         <p
-          className="f-serif italic"
-          style={{
-            fontSize: 'clamp(1rem, 2.5vw, 1.35rem)',
-            color: 'rgba(242,234,217,0.7)',
-            fontWeight: 400,
-            maxWidth: '560px',
-            margin: '0 auto',
-            lineHeight: 1.8,
-          }}
+          className="f-display"
+          style={{ fontSize: 'clamp(1rem, 2.5vw, 1.3rem)', fontStyle: 'italic', fontWeight: 300, color: 'rgba(240,232,216,0.6)', lineHeight: 1.9, maxWidth: '520px', margin: '0 auto' }}
         >
           „Das größte Geschenk für uns ist, unseren Tag mit euch zu verbringen."
         </p>
