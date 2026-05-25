@@ -2,348 +2,354 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
-import { Plus, Trash2, Users, GripVertical } from 'lucide-react'
+import { Plus, Search, Trash2, X } from 'lucide-react'
 
-type Table = {
-  id: string
-  name: string
-  seats: number
-  x_pos: number
-  y_pos: number
-  shape: 'round' | 'rect'
+type Table = { id:string; name:string; seats:number; x_pos:number; y_pos:number; shape:'round'|'rect' }
+type Guest = { id:string; name:string; table_id:string|null; rsvp_status:string; adults:number; children:number }
+
+const PALETTE = [
+  '#5A8A6A','#C8A96E','#C4856A','#7B9E87','#9B7B6E',
+  '#6B8E9B','#A07840','#8A7B6A','#6A8A7B','#7B6A8A','#8A6A7B',
+]
+
+const TABLE_R = 42   // table circle radius px
+const SEAT_R  = 14   // seat circle radius px
+const ORBIT   = TABLE_R + SEAT_R + 8   // center → seat center
+const WRAP    = (ORBIT + SEAT_R + 12) * 2  // wrapper div (includes seats)
+
+function initials(name: string) {
+  const p = name.trim().split(/\s+/)
+  return p.length >= 2 ? (p[0][0] + p[p.length-1][0]).toUpperCase() : name.slice(0,2).toUpperCase()
 }
 
-type Guest = {
-  id: string
-  name: string
-  table_id: string | null
-  rsvp_status: string
-  adults: number
-  children: number
+function seatPos(total: number, i: number) {
+  const a = (i / total) * 2 * Math.PI - Math.PI / 2
+  return { x: Math.cos(a) * ORBIT, y: Math.sin(a) * ORBIT }
 }
 
 export default function SitzplanPage() {
-  const [tables, setTables]   = useState<Table[]>([])
-  const [guests, setGuests]   = useState<Guest[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [newTable, setNewTable] = useState<{ name: string; seats: number; shape: 'round' | 'rect' }>({ name: '', seats: 8, shape: 'round' })
-  const [dragGuest, setDragGuest] = useState<string | null>(null)
-  const [dragTable, setDragTable] = useState<string | null>(null)
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+  const [tables, setTables]       = useState<Table[]>([])
+  const [guests, setGuests]       = useState<Guest[]>([])
+  const [loading, setLoading]     = useState(true)
+  const [showForm, setShowForm]   = useState(false)
+  const [nt, setNt] = useState<{name:string;seats:number;shape:'round'|'rect'}>({name:'',seats:8,shape:'round'})
+  const [search, setSearch]       = useState('')
+  const [dragGId, setDragGId]     = useState<string|null>(null)
+  const [dragTId, setDragTId]     = useState<string|null>(null)
+  const [dOff, setDOff]           = useState({x:0,y:0})
+  const [hoverT, setHoverT]       = useState<string|null>(null)
+  const [dropTarget, setDropTarget] = useState<string|null>(null)
   const canvasRef = useRef<HTMLDivElement>(null)
 
-  async function loadData() {
-    const [{ data: td }, { data: gd }] = await Promise.all([
+  async function load() {
+    const [{data:td},{data:gd}] = await Promise.all([
       supabase.from('tables').select('*').order('created_at'),
-      supabase.from('guests').select('id, name, table_id, rsvp_status, adults, children').eq('rsvp_status', 'confirmed'),
+      supabase.from('guests').select('id,name,table_id,rsvp_status,adults,children').eq('rsvp_status','confirmed'),
     ])
     if (td) setTables(td as Table[])
     if (gd) setGuests(gd as Guest[])
     setLoading(false)
   }
-
-  useEffect(() => { loadData() }, [])
+  useEffect(()=>{ load() },[])
 
   async function addTable() {
-    if (!newTable.name) return
+    if (!nt.name) return
     const rect = canvasRef.current?.getBoundingClientRect()
-    const cx = rect ? rect.width / 2 : 250
-    const cy = rect ? rect.height / 2 : 200
     await supabase.from('tables').insert({
-      name: newTable.name, seats: newTable.seats, shape: newTable.shape,
-      x_pos: cx + (Math.random() - 0.5) * 200,
-      y_pos: cy + (Math.random() - 0.5) * 150,
+      name: nt.name, seats: nt.seats, shape: nt.shape,
+      x_pos: (rect?.width  ?? 600) / 2 + (Math.random()-0.5) * 250,
+      y_pos: (rect?.height ?? 420) / 2 + (Math.random()-0.5) * 130,
     })
-    setNewTable({ name: '', seats: 8, shape: 'round' })
+    setNt({name:'',seats:8,shape:'round'})
     setShowForm(false)
-    loadData()
+    load()
   }
 
   async function deleteTable(id: string) {
-    if (!confirm('Tisch löschen? Gäste werden nicht mehr zugewiesen.')) return
     await supabase.from('tables').delete().eq('id', id)
-    await supabase.from('guests').update({ table_id: null }).eq('table_id', id)
-    loadData()
+    await supabase.from('guests').update({table_id: null}).eq('table_id', id)
+    load()
   }
 
-  async function assignGuest(guestId: string, tableId: string | null) {
-    await supabase.from('guests').update({ table_id: tableId }).eq('id', guestId)
-    setGuests(prev => prev.map(g => g.id === guestId ? { ...g, table_id: tableId } : g))
+  async function assign(guestId: string, tableId: string|null) {
+    await supabase.from('guests').update({table_id: tableId}).eq('id', guestId)
+    setGuests(p => p.map(g => g.id===guestId ? {...g, table_id: tableId} : g))
   }
 
-  // Table drag on canvas
-  function onTableMouseDown(e: React.MouseEvent, tableId: string, x: number, y: number) {
-    e.preventDefault()
-    setDragTable(tableId)
-    setDragOffset({ x: e.clientX - x, y: e.clientY - y })
+  // ── Table drag on canvas ──────────────────────────────
+  function tableMouseDown(e: React.MouseEvent, tId: string) {
+    e.preventDefault(); e.stopPropagation()
+    const t = tables.find(t=>t.id===tId)!
+    const rect = canvasRef.current!.getBoundingClientRect()
+    setDragTId(tId)
+    setDOff({ x: e.clientX - rect.left - t.x_pos, y: e.clientY - rect.top - t.y_pos })
+  }
+  function canvasMove(e: React.MouseEvent) {
+    if (!dragTId) return
+    const rect = canvasRef.current!.getBoundingClientRect()
+    setTables(p => p.map(t => t.id===dragTId
+      ? {...t, x_pos: e.clientX-rect.left-dOff.x, y_pos: e.clientY-rect.top-dOff.y}
+      : t))
+  }
+  async function canvasUp() {
+    if (!dragTId) return
+    const t = tables.find(t=>t.id===dragTId)
+    if (t) await supabase.from('tables').update({x_pos:t.x_pos,y_pos:t.y_pos}).eq('id',dragTId)
+    setDragTId(null)
   }
 
-  function onCanvasMouseMove(e: React.MouseEvent) {
-    if (!dragTable) return
-    const rect = canvasRef.current?.getBoundingClientRect()
-    if (!rect) return
-    const newX = e.clientX - rect.left - dragOffset.x + (tables.find(t => t.id === dragTable)?.x_pos ?? 0)
-    // Actually recalculate properly:
-    const x = e.clientX - dragOffset.x
-    const y = e.clientY - dragOffset.y
-    setTables(prev => prev.map(t => t.id === dragTable ? { ...t, x_pos: x, y_pos: y } : t))
-  }
-
-  async function onCanvasMouseUp() {
-    if (!dragTable) return
-    const t = tables.find(t => t.id === dragTable)
-    if (t) await supabase.from('tables').update({ x_pos: t.x_pos, y_pos: t.y_pos }).eq('id', dragTable)
-    setDragTable(null)
-  }
-
-  // Guest HTML5 drag & drop onto tables
-  function onGuestDragStart(e: React.DragEvent, guestId: string) {
-    setDragGuest(guestId)
+  // ── Guest HTML5 drag & drop ───────────────────────────
+  function guestDragStart(e: React.DragEvent, gId: string) {
+    setDragGId(gId)
+    e.dataTransfer.setData('text/plain', gId)
     e.dataTransfer.effectAllowed = 'move'
-    e.dataTransfer.setData('guestId', guestId)
+  }
+  function tableDrop(e: React.DragEvent, tableId: string) {
+    e.preventDefault(); e.stopPropagation()
+    const gId = e.dataTransfer.getData('text/plain') || dragGId
+    if (gId) assign(gId, tableId)
+    setDragGId(null); setDropTarget(null)
+  }
+  function canvasDrop(e: React.DragEvent) {
+    // Drop on empty canvas → remove from table
+    const gId = e.dataTransfer.getData('text/plain') || dragGId
+    if (gId) assign(gId, null)
+    setDragGId(null); setDropTarget(null)
   }
 
-  function onTableDrop(e: React.DragEvent, tableId: string) {
-    e.preventDefault()
-    const gId = e.dataTransfer.getData('guestId') || dragGuest
-    if (gId) { assignGuest(gId, tableId); setDragGuest(null) }
-  }
-
-  function onTableDragOver(e: React.DragEvent) { e.preventDefault(); e.dataTransfer.dropEffect = 'move' }
-
-  const unassigned = guests.filter(g => !g.table_id)
-  const tableGuests = (tableId: string) => guests.filter(g => g.table_id === tableId)
-  const occupancy   = (tableId: string) => tableGuests(tableId).reduce((s, g) => s + g.adults + g.children, 0)
+  const colorMap = new Map(guests.map((g,i) => [g.id, PALETTE[i % PALETTE.length]]))
+  const tableGuests = (tId: string) => guests.filter(g => g.table_id===tId)
+  const pool = guests.filter(g => !g.table_id && g.name.toLowerCase().includes(search.toLowerCase()))
 
   return (
-    <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+    <div style={{display:'flex',flexDirection:'column',height:'calc(100vh - 130px)',minHeight:'520px',maxWidth:'1200px',margin:'0 auto'}}>
 
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
+      {/* ── Header ── */}
+      <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:'0.875rem',flexShrink:0,flexWrap:'wrap',gap:'0.5rem'}}>
         <div>
-          <h1 className="t-display" style={{ fontSize: '2rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--dark)' }}>Sitzplan</h1>
-          <p className="t-ui" style={{ fontSize: '0.82rem', color: 'var(--muted)', marginTop: '0.25rem' }}>
-            {tables.length} Tische · {guests.length} Gäste zugesagt · {unassigned.length} nicht platziert
+          <h1 className="t-display" style={{fontSize:'2rem',fontStyle:'italic',fontWeight:400,color:'var(--dark)'}}>Sitzplan</h1>
+          <p className="t-ui" style={{fontSize:'0.78rem',color:'var(--muted)',marginTop:'0.2rem'}}>
+            {tables.length} Tische · {guests.length} Gäste zugesagt · {guests.filter(g=>!g.table_id).length} nicht platziert
           </p>
         </div>
-        <button
-          onClick={() => setShowForm(!showForm)}
-          className="btn btn-dark"
-          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.55rem 1.4rem' }}
-        >
-          <Plus size={14} /> Tisch
+        <button onClick={()=>setShowForm(v=>!v)} className="btn btn-dark"
+          style={{display:'flex',alignItems:'center',gap:'0.4rem',padding:'0.5rem 1.25rem'}}>
+          <Plus size={13}/> Tisch hinzufügen
         </button>
       </div>
 
-      {/* Add Table Form */}
+      {/* ── Add Table Form ── */}
       {showForm && (
-        <div style={{ background: 'var(--off)', border: '1px solid var(--light)', padding: '1.5rem', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: '1rem', marginBottom: '1rem' }}>
-            <div>
-              <label className="eyebrow" style={{ fontSize: '0.5rem', color: 'var(--muted)', display: 'block', marginBottom: '0.4rem' }}>Name *</label>
-              <input placeholder="z. B. Tisch 1" value={newTable.name} onChange={e => setNewTable({ ...newTable, name: e.target.value })} className="field" />
+        <div style={{background:'var(--off)',border:'1px solid var(--light)',padding:'0.875rem 1.25rem',marginBottom:'0.875rem',flexShrink:0}}>
+          <div style={{display:'flex',gap:'0.75rem',flexWrap:'wrap',alignItems:'flex-end'}}>
+            <div style={{flex:'2 1 140px'}}>
+              <label className="eyebrow" style={{fontSize:'0.48rem',color:'var(--muted)',display:'block',marginBottom:'0.3rem'}}>Name *</label>
+              <input placeholder="Tisch 1" value={nt.name} onChange={e=>setNt({...nt,name:e.target.value})}
+                onKeyDown={e=>e.key==='Enter'&&addTable()} className="field"/>
             </div>
-            <div>
-              <label className="eyebrow" style={{ fontSize: '0.5rem', color: 'var(--muted)', display: 'block', marginBottom: '0.4rem' }}>Plätze</label>
-              <input type="number" min={2} max={30} value={newTable.seats} onChange={e => setNewTable({ ...newTable, seats: +e.target.value })} className="field" />
+            <div style={{flex:'1 1 70px'}}>
+              <label className="eyebrow" style={{fontSize:'0.48rem',color:'var(--muted)',display:'block',marginBottom:'0.3rem'}}>Plätze</label>
+              <input type="number" min={2} max={20} value={nt.seats} onChange={e=>setNt({...nt,seats:+e.target.value})} className="field"/>
             </div>
-            <div>
-              <label className="eyebrow" style={{ fontSize: '0.5rem', color: 'var(--muted)', display: 'block', marginBottom: '0.4rem' }}>Form</label>
-              <select value={newTable.shape} onChange={e => setNewTable({ ...newTable, shape: e.target.value as 'round' | 'rect' })}
-                style={{ width: '100%', fontFamily: 'Raleway, sans-serif', fontSize: '0.85rem', border: 'none', borderBottom: '1px solid var(--light)', padding: '0.7rem 0', background: 'transparent', outline: 'none', color: 'var(--dark)', cursor: 'pointer' }}>
+            <div style={{flex:'1 1 100px'}}>
+              <label className="eyebrow" style={{fontSize:'0.48rem',color:'var(--muted)',display:'block',marginBottom:'0.3rem'}}>Form</label>
+              <select value={nt.shape} onChange={e=>setNt({...nt,shape:e.target.value as 'round'|'rect'})}
+                style={{width:'100%',fontFamily:'Raleway,sans-serif',fontSize:'0.85rem',border:'none',borderBottom:'1px solid var(--light)',padding:'0.7rem 0',background:'transparent',outline:'none',color:'var(--dark)',cursor:'pointer'}}>
                 <option value="round">Rund</option>
                 <option value="rect">Rechteckig</option>
               </select>
             </div>
-          </div>
-          <div style={{ display: 'flex', gap: '0.75rem' }}>
-            <button onClick={addTable} className="btn btn-dark" style={{ padding: '0.55rem 1.4rem' }}>Hinzufügen</button>
-            <button onClick={() => setShowForm(false)} className="btn btn-outline" style={{ padding: '0.55rem 1.4rem' }}>Abbrechen</button>
+            <div style={{display:'flex',gap:'0.4rem'}}>
+              <button onClick={addTable} className="btn btn-dark" style={{padding:'0.45rem 1rem'}}>Hinzufügen</button>
+              <button onClick={()=>setShowForm(false)} className="btn btn-outline" style={{padding:'0.45rem 0.75rem'}}><X size={13}/></button>
+            </div>
           </div>
         </div>
       )}
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 280px', gap: '1.5rem', alignItems: 'start' }}>
+      {/* ── Canvas ── */}
+      <div
+        ref={canvasRef}
+        style={{
+          flex:1, position:'relative', overflow:'hidden',
+          background:'#BFA870',
+          cursor: dragTId ? 'grabbing' : 'default',
+          userSelect:'none',
+        }}
+        onMouseMove={canvasMove}
+        onMouseUp={canvasUp}
+        onMouseLeave={canvasUp}
+        onDragOver={e=>e.preventDefault()}
+        onDrop={canvasDrop}
+      >
+        {/* Wood grain SVG */}
+        <svg style={{position:'absolute',inset:0,width:'100%',height:'100%',pointerEvents:'none',opacity:0.12}} preserveAspectRatio="none">
+          <defs>
+            <pattern id="woodgrain" width="10" height="100%" patternUnits="userSpaceOnUse">
+              <line x1="5" y1="0" x2="5" y2="100%" stroke="#5A3808" strokeWidth="2"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#woodgrain)"/>
+        </svg>
 
-        {/* Canvas / Floor Plan */}
-        <div
-          ref={canvasRef}
-          style={{
-            position: 'relative', minHeight: '520px', background: '#F5F0E8',
-            border: '1px solid var(--light)', overflow: 'hidden', cursor: dragTable ? 'grabbing' : 'default', userSelect: 'none',
-          }}
-          onMouseMove={onCanvasMouseMove}
-          onMouseUp={onCanvasMouseUp}
-          onMouseLeave={onCanvasMouseUp}
-        >
-          {/* Grid pattern */}
-          <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none' }}>
-            <defs>
-              <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="rgba(200,169,110,0.12)" strokeWidth="1" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#grid)" />
-          </svg>
-
-          {/* Dancefloor */}
-          <div style={{
-            position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)',
-            width: '150px', height: '70px', border: '1px dashed rgba(200,169,110,0.5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-          }}>
-            <span className="eyebrow" style={{ color: 'rgba(200,169,110,0.6)', fontSize: '0.45rem' }}>Tanzfläche</span>
+        {tables.length===0 && !loading && (
+          <div style={{position:'absolute',inset:0,display:'flex',alignItems:'center',justifyContent:'center',pointerEvents:'none'}}>
+            <p style={{fontFamily:'Raleway,sans-serif',fontSize:'0.72rem',letterSpacing:'0.3em',textTransform:'uppercase',color:'rgba(80,50,10,0.35)'}}>
+              Tisch hinzufügen
+            </p>
           </div>
+        )}
 
-          {/* Tables */}
-          {tables.map(table => {
-            const occ = occupancy(table.id)
-            const tg  = tableGuests(table.id)
-            const over = occ > table.seats
-            const isRound = table.shape === 'round'
-            const w = isRound ? 90 : 110
-            const h = isRound ? 90 : 65
-            return (
-              <div
-                key={table.id}
-                onMouseDown={e => onTableMouseDown(e, table.id, table.x_pos, table.y_pos)}
-                onDrop={e => onTableDrop(e, table.id)}
-                onDragOver={onTableDragOver}
-                style={{
-                  position: 'absolute',
-                  left: table.x_pos, top: table.y_pos,
-                  transform: 'translate(-50%, -50%)',
-                  cursor: 'grab',
-                  zIndex: dragTable === table.id ? 10 : 1,
-                }}
-                className="group"
-              >
-                <div style={{
-                  width: w, height: h,
-                  borderRadius: isRound ? '50%' : '4px',
-                  background: 'var(--white)',
-                  border: `2px solid ${over ? 'var(--rose)' : 'var(--gold)'}`,
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-                  boxShadow: '0 2px 12px rgba(0,0,0,0.08)',
-                  transition: 'box-shadow 0.15s',
-                  position: 'relative',
-                }}>
-                  <p style={{ fontFamily: 'Playfair Display, serif', fontSize: '0.75rem', fontWeight: 500, color: 'var(--dark)', textAlign: 'center', lineHeight: 1.2, padding: '0 0.4rem' }}>
-                    {table.name}
-                  </p>
-                  <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.62rem', color: over ? 'var(--rose)' : 'var(--muted)', marginTop: '2px' }}>
-                    {occ}/{table.seats}
-                  </p>
-                  {tg.length > 0 && (
-                    <p style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.52rem', color: 'var(--muted)', marginTop: '1px', textAlign: 'center', padding: '0 4px', lineHeight: 1.2 }}>
-                      {tg.slice(0, 2).map(g => g.name.split(' ')[0]).join(', ')}{tg.length > 2 ? ` +${tg.length - 2}` : ''}
-                    </p>
-                  )}
-                  <button
-                    onMouseDown={e => e.stopPropagation()}
-                    onClick={() => deleteTable(table.id)}
-                    style={{
-                      position: 'absolute', top: '-8px', right: '-8px',
-                      width: '20px', height: '20px', borderRadius: '50%',
-                      background: 'var(--rose)', border: 'none', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      opacity: 0, transition: 'opacity 0.15s',
-                    }}
-                    className="group-hover:opacity-100"
-                  >
-                    <Trash2 size={10} color="white" />
-                  </button>
-                </div>
-              </div>
-            )
-          })}
+        {tables.map(table => {
+          const assigned = tableGuests(table.id)
+          const isDropTarget = dropTarget === table.id
+          const isRound = table.shape === 'round'
 
-          {tables.length === 0 && !loading && (
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <p className="eyebrow" style={{ color: 'rgba(200,169,110,0.4)', fontSize: '0.52rem' }}>
-                Tisch hinzufügen, dann hier positionieren
-              </p>
-            </div>
-          )}
-        </div>
-
-        {/* Right Panel */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-          {/* Unassigned Guests */}
-          <div style={{ background: 'var(--white)', border: '1px solid var(--light)', padding: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
-              <Users size={13} style={{ color: 'var(--muted)' }} />
-              <p className="eyebrow" style={{ fontSize: '0.5rem' }}>Nicht platziert ({unassigned.length})</p>
-            </div>
-            {unassigned.length === 0 ? (
-              <p className="t-ui" style={{ fontSize: '0.78rem', color: 'var(--muted)' }}>Alle platziert ✓</p>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '200px', overflowY: 'auto' }}>
-                {unassigned.map(g => (
+          return (
+            <div
+              key={table.id}
+              style={{
+                position:'absolute',
+                left: table.x_pos, top: table.y_pos,
+                width: WRAP, height: WRAP,
+                transform:'translate(-50%,-50%)',
+                zIndex: dragTId===table.id ? 20 : 2,
+              }}
+              onMouseEnter={()=>setHoverT(table.id)}
+              onMouseLeave={()=>setHoverT(null)}
+              onDragEnter={()=>setDropTarget(table.id)}
+              onDragLeave={e=>{ if (!e.currentTarget.contains(e.relatedTarget as Node)) setDropTarget(null) }}
+              onDragOver={e=>{ e.preventDefault(); e.stopPropagation() }}
+              onDrop={e=>tableDrop(e, table.id)}
+            >
+              {/* ── Seat circles ── */}
+              {Array.from({length: table.seats}, (_,i) => {
+                const pos   = seatPos(table.seats, i)
+                const guest = assigned[i] ?? null
+                const color = guest ? (colorMap.get(guest.id) ?? '#9A8A7A') : 'rgba(255,255,255,0.2)'
+                return (
                   <div
-                    key={g.id}
-                    draggable
-                    onDragStart={e => onGuestDragStart(e, g.id)}
+                    key={i}
+                    draggable={!!guest}
+                    onDragStart={guest ? e=>{ e.stopPropagation(); guestDragStart(e, guest.id) } : undefined}
+                    title={guest?.name ?? ''}
                     style={{
-                      display: 'flex', alignItems: 'center', gap: '0.5rem',
-                      padding: '0.5rem 0.75rem', background: 'var(--off)',
-                      cursor: 'grab', border: '1px solid var(--light)',
+                      position:'absolute',
+                      left: WRAP/2 + pos.x - SEAT_R,
+                      top:  WRAP/2 + pos.y - SEAT_R,
+                      width: SEAT_R*2, height: SEAT_R*2,
+                      borderRadius:'50%',
+                      background: color,
+                      border:`2px solid ${guest ? 'rgba(255,255,255,0.4)' : 'rgba(255,255,255,0.15)'}`,
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      cursor: guest ? 'grab' : 'default',
+                      boxShadow: guest ? '0 2px 6px rgba(0,0,0,0.25)' : 'none',
+                      zIndex:3,
+                      transition:'transform 0.1s',
                     }}
                   >
-                    <GripVertical size={12} style={{ color: 'var(--muted)', flexShrink: 0 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <p className="t-ui" style={{ fontSize: '0.8rem', color: 'var(--dark)', fontWeight: 400 }}>{g.name}</p>
-                      <p className="t-ui" style={{ fontSize: '0.68rem', color: 'var(--muted)' }}>{g.adults} Erw. {g.children > 0 ? `· ${g.children} K.` : ''}</p>
-                    </div>
-                    {tables.length > 0 && (
-                      <select
-                        onChange={e => e.target.value && assignGuest(g.id, e.target.value)}
-                        style={{ fontFamily: 'Raleway, sans-serif', fontSize: '0.68rem', border: '1px solid var(--light)', padding: '0.2rem 0.3rem', background: 'var(--white)', color: 'var(--muted)', cursor: 'pointer', outline: 'none', maxWidth: '90px' }}
-                      >
-                        <option value="">Tisch…</option>
-                        {tables.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                      </select>
+                    {guest && (
+                      <span style={{fontFamily:'Raleway,sans-serif',fontSize:'0.5rem',fontWeight:700,color:'white',letterSpacing:'0.02em'}}>
+                        {initials(guest.name)}
+                      </span>
                     )}
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                )
+              })}
 
-          {/* Table Summaries */}
-          {tables.map(table => {
-            const tg = tableGuests(table.id)
-            const occ = occupancy(table.id)
-            const over = occ > table.seats
-            return (
-              <div key={table.id} style={{ background: 'var(--white)', border: `1px solid ${over ? 'var(--rose)' : 'var(--light)'}`, padding: '1.25rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                  <p className="t-display" style={{ fontSize: '1rem', fontWeight: 500, color: 'var(--dark)' }}>{table.name}</p>
-                  <span className="eyebrow" style={{ fontSize: '0.48rem', color: over ? 'var(--rose)' : 'var(--muted)' }}>{occ}/{table.seats}</span>
-                </div>
-                {tg.length === 0 ? (
-                  <p className="t-ui" style={{ fontSize: '0.75rem', color: 'var(--muted)' }}>Noch leer</p>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
-                    {tg.map(g => (
-                      <div key={g.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <p className="t-ui" style={{ fontSize: '0.78rem', color: 'var(--dark)' }}>{g.name}</p>
-                        <button onClick={() => assignGuest(g.id, null)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: '1rem', lineHeight: 1, padding: '0 0.2rem' }}>×</button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+              {/* ── Table center ── */}
+              <div
+                onMouseDown={e=>tableMouseDown(e, table.id)}
+                style={{
+                  position:'absolute',
+                  left: WRAP/2 - TABLE_R, top: WRAP/2 - TABLE_R,
+                  width: TABLE_R*2, height: TABLE_R*2,
+                  borderRadius: isRound ? '50%' : '6px',
+                  background: isDropTarget ? 'rgba(255,248,232,1)' : 'rgba(245,235,205,0.97)',
+                  border: `2px solid ${isDropTarget ? 'var(--gold)' : 'rgba(175,135,60,0.6)'}`,
+                  boxShadow: isDropTarget
+                    ? '0 4px 20px rgba(0,0,0,0.2), 0 0 0 4px rgba(200,169,110,0.35)'
+                    : '0 3px 14px rgba(0,0,0,0.2)',
+                  display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+                  cursor:'grab', zIndex:4, transition:'box-shadow 0.15s, background 0.15s',
+                }}
+              >
+                <p style={{fontFamily:'Playfair Display,serif',fontSize:'0.72rem',fontStyle:'italic',color:'#4A3820',textAlign:'center',padding:'0 6px',lineHeight:1.2,fontWeight:500}}>
+                  {table.name}
+                </p>
+                <p style={{fontFamily:'Raleway,sans-serif',fontSize:'0.56rem',color:'rgba(90,65,30,0.55)',marginTop:'2px'}}>
+                  {assigned.length}/{table.seats}
+                </p>
               </div>
-            )
-          })}
-        </div>
+
+              {/* ── Delete button on hover ── */}
+              {hoverT===table.id && !dragTId && (
+                <button
+                  onMouseDown={e=>e.stopPropagation()}
+                  onClick={()=>deleteTable(table.id)}
+                  style={{
+                    position:'absolute',
+                    left: WRAP/2 + TABLE_R * Math.cos(-Math.PI/4) - 10,
+                    top:  WRAP/2 - TABLE_R * Math.sin(-Math.PI/4) - 10,
+                    width:20, height:20, borderRadius:'50%',
+                    background:'var(--rose)', border:'2px solid white',
+                    cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center',
+                    zIndex:10, boxShadow:'0 1px 5px rgba(0,0,0,0.3)',
+                  }}
+                >
+                  <Trash2 size={9} color="white"/>
+                </button>
+              )}
+            </div>
+          )
+        })}
       </div>
 
-      <p className="t-ui" style={{ fontSize: '0.72rem', color: 'var(--muted)', marginTop: '1rem', textAlign: 'center' }}>
-        Tische auf der Grundriss-Karte verschieben · Gäste per Dropdown oder Drag &amp; Drop zuweisen
-      </p>
+      {/* ── Guest Pool ── */}
+      <div style={{flexShrink:0, background:'var(--dark)', borderTop:'1px solid rgba(200,169,110,0.12)', padding:'0.75rem 1rem'}}>
+        <div style={{display:'flex',alignItems:'center',gap:'0.875rem',marginBottom:'0.5rem'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'0.4rem',background:'rgba(255,255,255,0.05)',border:'1px solid rgba(255,255,255,0.08)',padding:'0.28rem 0.65rem'}}>
+            <Search size={11} style={{color:'rgba(253,250,245,0.3)'}}/>
+            <input
+              placeholder="Gast suchen…" value={search} onChange={e=>setSearch(e.target.value)}
+              style={{background:'transparent',border:'none',outline:'none',fontFamily:'Raleway,sans-serif',fontSize:'0.75rem',color:'rgba(253,250,245,0.65)',width:'130px'}}
+            />
+          </div>
+          <p style={{fontFamily:'Raleway,sans-serif',fontSize:'0.6rem',letterSpacing:'0.18em',textTransform:'uppercase',color:'rgba(253,250,245,0.2)'}}>
+            auf Tisch ziehen zum Platzieren
+          </p>
+        </div>
+
+        <div style={{display:'flex',gap:'0.4rem',overflowX:'auto',paddingBottom:'2px',alignItems:'center'}}>
+          {pool.length===0 ? (
+            <p style={{fontFamily:'Raleway,sans-serif',fontSize:'0.75rem',color:'rgba(253,250,245,0.25)',padding:'0.2rem 0'}}>
+              {guests.filter(g=>!g.table_id).length===0
+                ? 'Alle Gäste sind platziert ✓'
+                : search ? 'Kein Treffer' : 'Keine Gäste ohne Zuweisung'}
+            </p>
+          ) : pool.map(g => (
+            <div
+              key={g.id}
+              draggable
+              onDragStart={e=>guestDragStart(e,g.id)}
+              title={g.name}
+              style={{
+                flexShrink:0, display:'flex', alignItems:'center', gap:'0.35rem',
+                padding:'0.28rem 0.6rem 0.28rem 0.35rem',
+                background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.09)',
+                cursor:'grab',
+              }}
+            >
+              <div style={{width:22,height:22,borderRadius:'50%',background:colorMap.get(g.id)??'#9A8A7A',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0,boxShadow:'0 1px 4px rgba(0,0,0,0.3)'}}>
+                <span style={{fontFamily:'Raleway,sans-serif',fontSize:'0.48rem',fontWeight:700,color:'white'}}>{initials(g.name)}</span>
+              </div>
+              <span style={{fontFamily:'Raleway,sans-serif',fontSize:'0.7rem',color:'rgba(253,250,245,0.65)',whiteSpace:'nowrap'}}>
+                {g.name}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }
