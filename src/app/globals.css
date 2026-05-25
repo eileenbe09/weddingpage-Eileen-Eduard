@@ -1,115 +1,127 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500;1,600&family=Montserrat:wght@200;300;400;500&family=Great+Vibes&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,700;1,400;1,500;1,700&family=Raleway:wght@200;300;400;500;600&display=swap');
 
-/* ── Farbpalette ────────────────────────────── */
+/* ── Palette ────────────────────────────── */
 :root {
-  --ivory:    #FAF7F2;
-  --linen:    #F0E8D8;
-  --sand:     #DFD0B8;
-  --gold:     #B8944A;
-  --sienna:   #9C6B3C;
-  --mahogany: #5C3D2E;
-  --espresso: #1E140A;
-  --smoke:    #8A7A6A;
+  --white:    #ffffff;
+  --off:      #F8F5F0;
+  --light:    #EDE8E0;
+  --gold:     #C8A96E;
+  --gold-d:   #A07840;
+  --dark:     #1C1410;
+  --mid:      #5A4A3A;
+  --muted:    #9A8A7A;
   --rose:     #C4856A;
 }
 
-*, *::before, *::after { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-
 body {
-  background: var(--ivory);
-  color: var(--espresso);
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Raleway', sans-serif;
   font-weight: 300;
+  color: var(--dark);
+  background: var(--white);
   -webkit-font-smoothing: antialiased;
+  letter-spacing: 0.01em;
 }
 
-/* ── Schriftklassen ─────────────────────────── */
-.f-display { font-family: 'Cormorant Garamond', serif; }
-.f-accent  { font-family: 'Great Vibes', cursive; }
-.f-ui      { font-family: 'Montserrat', sans-serif; }
+/* ── Typo ───────────────────────────────── */
+.t-display {
+  font-family: 'Playfair Display', serif;
+  line-height: 1.08;
+}
+.t-ui { font-family: 'Raleway', sans-serif; }
 
-/* ── Ornament-Linie ─────────────────────────── */
-.ornament {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+/* ── Eyebrow ────────────────────────────── */
+.eyebrow {
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
   color: var(--gold);
 }
-.ornament::before,
-.ornament::after {
+
+/* ── Divider ────────────────────────────── */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.divider::before, .divider::after {
   content: '';
   flex: 1;
   height: 1px;
   background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
-/* ── Primär-Button ──────────────────────────── */
+/* ── Buttons ────────────────────────────── */
 .btn {
-  display: inline-block;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.65rem;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.62rem;
   font-weight: 500;
-  letter-spacing: 0.25em;
+  letter-spacing: 0.26em;
   text-transform: uppercase;
-  padding: 0.9rem 2.2rem;
-  transition: all 0.3s ease;
+  padding: 0.95rem 2.4rem;
+  display: inline-block;
+  transition: all .25s ease;
   cursor: pointer;
 }
-.btn-filled {
-  background: var(--mahogany);
-  color: #fff;
-  border: 1px solid var(--mahogany);
-}
-.btn-filled:hover { background: var(--espresso); border-color: var(--espresso); }
+.btn-dark  { background: var(--dark);  color: #fff; border: 1px solid var(--dark); }
+.btn-dark:hover  { background: var(--mid); border-color: var(--mid); }
+.btn-light { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.6); }
+.btn-light:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
+.btn-gold  { background: var(--gold);  color: var(--dark); border: 1px solid var(--gold); font-weight: 600; }
+.btn-gold:hover  { background: var(--gold-d); border-color: var(--gold-d); }
+.btn-outline { background: transparent; color: var(--dark); border: 1px solid var(--dark); }
+.btn-outline:hover { color: var(--gold-d); border-color: var(--gold-d); }
 
-.btn-ghost {
-  background: transparent;
-  color: var(--espresso);
-  border: 1px solid var(--espresso);
-}
-.btn-ghost:hover { color: var(--gold); border-color: var(--gold); }
+/* ── Section ────────────────────────────── */
+.section { padding: 6rem 1.5rem; }
+.section-white  { background: var(--white); }
+.section-off    { background: var(--off); }
+.section-light  { background: var(--light); }
+.section-dark   { background: var(--dark); }
 
-/* ── Eyebrow-Label ──────────────────────────── */
-.eyebrow {
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.6rem;
-  font-weight: 500;
-  letter-spacing: 0.4em;
-  text-transform: uppercase;
-  color: var(--sienna);
+/* ── Section Header ─────────────────────── */
+.section-header { text-align: center; margin-bottom: 4rem; }
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 400;
+  color: var(--dark);
+  margin-top: 0.8rem;
+  margin-bottom: 1.2rem;
 }
+.section-title-light { color: var(--white); }
 
-/* ── Card ───────────────────────────────────── */
+/* ── Card ───────────────────────────────── */
 .card {
-  background: #fff;
-  border: 1px solid var(--sand);
-  transition: box-shadow 0.3s, transform 0.3s;
+  background: var(--white);
+  border: 1px solid var(--light);
+  transition: box-shadow .3s, transform .3s;
 }
-.card:hover {
-  box-shadow: 0 12px 48px rgba(30,20,10,0.09);
-  transform: translateY(-3px);
-}
+.card:hover { box-shadow: 0 10px 40px rgba(28,20,16,.08); transform: translateY(-2px); }
 
-/* ── Formfelder ─────────────────────────────── */
+/* ── Form Fields ────────────────────────── */
 .field {
   width: 100%;
+  font-family: 'Raleway', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 300;
+  color: var(--dark);
   background: transparent;
   border: none;
-  border-bottom: 1px solid var(--sand);
+  border-bottom: 1px solid var(--light);
   padding: 0.7rem 0;
-  font-family: 'Montserrat', sans-serif;
-  font-size: 0.88rem;
-  font-weight: 300;
-  color: var(--espresso);
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color .2s;
+  letter-spacing: 0.02em;
 }
 .field:focus { border-color: var(--gold); }
-.field::placeholder { color: var(--smoke); font-size: 0.82rem; }
+.field::placeholder { color: var(--muted); font-size: 0.82rem; }
 
-/* ── Scrollbar ──────────────────────────────── */
+/* ── Scrollbar ──────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--linen); }
-::-webkit-scrollbar-thumb { background: var(--sand); border-radius: 4px; }
+::-webkit-scrollbar-track { background: var(--off); }
+::-webkit-scrollbar-thumb { background: var(--light); border-radius: 4px; }
