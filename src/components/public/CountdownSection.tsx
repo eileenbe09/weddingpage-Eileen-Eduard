@@ -18,7 +18,7 @@ export default function CountdownSection() {
   ]
 
   return (
-    <section className="section section-off" style={{ padding: '5rem 1.5rem' }}>
+    <section className="section section-off" style={{ padding: '3.5rem 1.5rem' }}>
       <div style={{ maxWidth: '900px', margin: '0 auto', textAlign: 'center' }}>
 
         <p className="eyebrow" style={{ marginBottom: '3rem' }}>Noch bis zu unserem großen Tag</p>

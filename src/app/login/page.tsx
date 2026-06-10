@@ -23,38 +23,48 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem', background: 'var(--dark)' }}>
+    <div style={{
+      minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '2rem', background: 'linear-gradient(145deg, #EAE0CF 0%, #B6C8A2 100%)',
+    }}>
       <div style={{ width: '100%', maxWidth: '400px' }}>
 
-        <Link href="/" className="eyebrow" style={{ color: 'rgba(253,250,245,0.3)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '3.5rem' }}>
+        <Link href="/" className="eyebrow" style={{
+          color: 'var(--mid)', display: 'inline-flex', alignItems: 'center',
+          gap: '0.5rem', marginBottom: '2rem', textDecoration: 'none',
+        }}>
           <ArrowLeft size={13} /> Zur Hochzeitsseite
         </Link>
 
-        <div style={{ textAlign: 'center', marginBottom: '3.5rem' }}>
-          <p className="t-display" style={{ fontSize: '3.5rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--gold)', lineHeight: 1, marginBottom: '0.75rem' }}>
-            E &amp; E
-          </p>
-          <p className="eyebrow" style={{ color: 'rgba(253,250,245,0.25)', fontSize: '0.55rem' }}>Brautpaar-Bereich</p>
+        <div style={{ background: 'var(--white)', border: '1px solid var(--light)', padding: '2.75rem 2.25rem', boxShadow: '0 8px 40px rgba(26,34,22,0.10)' }}>
+
+          <div style={{ textAlign: 'center', marginBottom: '2.25rem' }}>
+            <p className="t-display" style={{ fontSize: '3rem', fontStyle: 'italic', fontWeight: 400, color: 'var(--gold)', lineHeight: 1, marginBottom: '0.5rem' }}>
+              E &amp; E
+            </p>
+            <p className="eyebrow" style={{ color: 'var(--muted)', fontSize: '0.52rem' }}>Brautpaar-Bereich</p>
+          </div>
+
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+            <div>
+              <label className="eyebrow" style={{ fontSize: '0.52rem', color: 'var(--muted)', display: 'block', marginBottom: '0.5rem' }}>E-Mail</label>
+              <input type="email" required className="field" placeholder="deine@email.de"
+                value={email} onChange={e => setEmail(e.target.value)} />
+            </div>
+            <div>
+              <label className="eyebrow" style={{ fontSize: '0.52rem', color: 'var(--muted)', display: 'block', marginBottom: '0.5rem' }}>Passwort</label>
+              <input type="password" required className="field" placeholder="••••••••"
+                value={password} onChange={e => setPassword(e.target.value)} />
+            </div>
+
+            {error && <p className="t-ui" style={{ fontSize: '0.82rem', color: 'var(--rose)', textAlign: 'center' }}>{error}</p>}
+
+            <button type="submit" disabled={loading} className="btn btn-gold"
+              style={{ marginTop: '0.25rem', opacity: loading ? 0.6 : 1, width: '100%', textAlign: 'center' }}>
+              {loading ? 'Anmelden…' : 'Einloggen'}
+            </button>
+          </form>
         </div>
-
-        <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-          <div>
-            <label className="eyebrow" style={{ fontSize: '0.55rem', color: 'rgba(253,250,245,0.3)', display: 'block', marginBottom: '0.5rem' }}>E-Mail</label>
-            <input type="email" required className="field" value={email} onChange={e => setEmail(e.target.value)}
-              style={{ borderColor: 'rgba(200,169,110,0.2)', color: 'rgba(253,250,245,0.85)' }} />
-          </div>
-          <div>
-            <label className="eyebrow" style={{ fontSize: '0.55rem', color: 'rgba(253,250,245,0.3)', display: 'block', marginBottom: '0.5rem' }}>Passwort</label>
-            <input type="password" required className="field" value={password} onChange={e => setPassword(e.target.value)}
-              style={{ borderColor: 'rgba(200,169,110,0.2)', color: 'rgba(253,250,245,0.85)' }} />
-          </div>
-
-          {error && <p className="t-ui" style={{ fontSize: '0.82rem', color: 'var(--rose)', textAlign: 'center' }}>{error}</p>}
-
-          <button type="submit" disabled={loading} className="btn btn-gold" style={{ marginTop: '0.5rem', opacity: loading ? 0.6 : 1 }}>
-            {loading ? 'Anmelden…' : 'Einloggen'}
-          </button>
-        </form>
       </div>
     </div>
   )
