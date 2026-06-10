@@ -9,7 +9,7 @@ export default function HeroSection() {
       style={{
         minHeight: '100vh',
         /* Fotorealistischer Dark-Overlay – bereit für ein echtes Bild als background-image */
-        background: 'linear-gradient(165deg, #2C1F14 0%, #1C1410 40%, #3D2B1E 70%, #1C1410 100%)',
+        background: 'linear-gradient(165deg, #242E1E 0%, #1A2216 40%, #2E3C26 70%, #1A2216 100%)',
       }}
     >
       {/* Subtiles Körnung-Overlay für Foto-Textur-Gefühl */}
@@ -19,8 +19,8 @@ export default function HeroSection() {
       />
 
       {/* Goldene Rand-Linie oben und unten */}
-      <div className="absolute top-8 left-8 right-8 h-px pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, rgba(200,169,110,0.4), transparent)' }} />
-      <div className="absolute bottom-8 left-8 right-8 h-px pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, rgba(200,169,110,0.4), transparent)' }} />
+      <div className="absolute top-8 left-8 right-8 h-px pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, rgba(192,124,104,0.35), transparent)' }} />
+      <div className="absolute bottom-8 left-8 right-8 h-px pointer-events-none" style={{ background: 'linear-gradient(90deg, transparent, rgba(192,124,104,0.35), transparent)' }} />
 
       {/* Inhalt */}
       <div className="relative z-10 flex flex-col items-center px-6" style={{ gap: '1.8rem', maxWidth: '820px' }}>

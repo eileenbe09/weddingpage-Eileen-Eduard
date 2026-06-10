@@ -10,7 +10,7 @@ const wishes = [
 
 export default function GiftSection() {
   return (
-    <section id="geschenke" className="section section-light">
+    <section id="geschenke" className="section section-off">
       <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center' }}>
 
         <div className="section-header">

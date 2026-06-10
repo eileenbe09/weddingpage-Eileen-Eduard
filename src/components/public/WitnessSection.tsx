@@ -17,7 +17,7 @@ const witnesses = [
 
 export default function WitnessSection() {
   return (
-    <section id="trauzeugen" className="section section-white">
+    <section id="trauzeugen" className="section section-sage">
       <div style={{ maxWidth: '800px', margin: '0 auto' }}>
 
         <div className="section-header">

@@ -3,15 +3,18 @@
 
 /* ── Palette ────────────────────────────── */
 :root {
-  --white:    #ffffff;
-  --off:      #F8F5F0;
-  --light:    #EDE8E0;
-  --gold:     #C8A96E;
-  --gold-d:   #A07840;
-  --dark:     #1C1410;
-  --mid:      #5A4A3A;
-  --muted:    #9A8A7A;
-  --rose:     #C4856A;
+  --white:    #FDFAF5;
+  --off:      #EAE0CF;   /* warmes Creme */
+  --light:    #D2C8B6;   /* Rahmen / Trennlinien */
+  --gold:     #C07C68;   /* Terrakotta – Hauptakzent */
+  --gold-d:   #9E5E4C;   /* dunkles Terrakotta */
+  --dark:     #1A2216;   /* sehr dunkles Salbei-Oliv */
+  --mid:      #485640;   /* mittleres Salbei */
+  --muted:    #7A8270;   /* gedämpftes Salbei-Grau */
+  --rose:     #C07C68;   /* = Terrakotta */
+  --sage:     #6C8260;   /* mittleres Salbei */
+  --sage-l:   #B6C8A2;   /* helles Salbei */
+  --sand:     #C2B292;   /* warmes Sand */
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -66,21 +69,23 @@ body {
   display: inline-block;
   transition: all .25s ease;
   cursor: pointer;
+  text-decoration: none;
 }
-.btn-dark  { background: var(--dark);  color: #fff; border: 1px solid var(--dark); }
-.btn-dark:hover  { background: var(--mid); border-color: var(--mid); }
-.btn-light { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.6); }
-.btn-light:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
-.btn-gold  { background: var(--gold);  color: var(--dark); border: 1px solid var(--gold); font-weight: 600; }
-.btn-gold:hover  { background: var(--gold-d); border-color: var(--gold-d); }
+.btn-dark    { background: var(--dark);  color: #fff; border: 1px solid var(--dark); }
+.btn-dark:hover    { background: var(--mid);  border-color: var(--mid); }
+.btn-light   { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.6); }
+.btn-light:hover   { background: rgba(255,255,255,0.1); border-color: #fff; }
+.btn-gold    { background: var(--gold);  color: #fff; border: 1px solid var(--gold); font-weight: 600; }
+.btn-gold:hover    { background: var(--gold-d); border-color: var(--gold-d); }
 .btn-outline { background: transparent; color: var(--dark); border: 1px solid var(--dark); }
-.btn-outline:hover { color: var(--gold-d); border-color: var(--gold-d); }
+.btn-outline:hover { color: var(--gold); border-color: var(--gold); }
 
-/* ── Section ────────────────────────────── */
-.section { padding: 6rem 1.5rem; }
+/* ── Sections ───────────────────────────── */
+.section        { padding: 6rem 1.5rem; }
 .section-white  { background: var(--white); }
 .section-off    { background: var(--off); }
-.section-light  { background: var(--light); }
+.section-sage   { background: var(--sage-l); }   /* helles Salbei */
+.section-light  { background: var(--sage-l); }   /* alias → Salbei */
 .section-dark   { background: var(--dark); }
 
 /* ── Section Header ─────────────────────── */
@@ -101,7 +106,7 @@ body {
   border: 1px solid var(--light);
   transition: box-shadow .3s, transform .3s;
 }
-.card:hover { box-shadow: 0 10px 40px rgba(28,20,16,.08); transform: translateY(-2px); }
+.card:hover { box-shadow: 0 10px 40px rgba(26,34,22,.08); transform: translateY(-2px); }
 
 /* ── Form Fields ────────────────────────── */
 .field {
